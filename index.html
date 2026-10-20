@@ -1710,12 +1710,9 @@
       try {
         const checkUrl = 'https://api.github.com/repos/' + GITHUB_REPO_OWNER + '/' + GITHUB_REPO_NAME + '/contents/' + GITHUB_CLOUD_FILE + '?ref=' + GITHUB_CLOUD_BRANCH + '&_t=' + Date.now();
         const getRes = await fetch(checkUrl, {
-          cache: 'no-store',
           headers: {
             'Authorization': 'token ' + token,
-            'Accept': 'application/vnd.github.v3+json',
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache'
+            'Accept': 'application/vnd.github.v3+json'
           }
         });
         if (getRes.ok) {
@@ -1773,12 +1770,10 @@
         const putUrl = 'https://api.github.com/repos/' + GITHUB_REPO_OWNER + '/' + GITHUB_REPO_NAME + '/contents/' + GITHUB_CLOUD_FILE;
         const putRes = await fetch(putUrl, {
           method: 'PUT',
-          cache: 'no-store',
           headers: {
             'Authorization': 'token ' + token,
             'Accept': 'application/vnd.github.v3+json',
-            'Content-Type': 'application/json',
-            'Cache-Control': 'no-cache, no-store'
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify(bodyObj)
         });
@@ -1830,7 +1825,7 @@
           headers['Authorization'] = 'token ' + token;
         }
 
-        const res = await fetch(url, { cache: 'no-store', headers });
+        const res = await fetch(url, { headers });
         if (!res.ok) {
           isSyncing = false;
           updateCloudStatusUI();
