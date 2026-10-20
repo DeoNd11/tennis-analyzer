@@ -1706,28 +1706,46 @@
       }
     }
 
-    async function pushToGitHubCloud(showFeedback = false) {
+    async function getLatestFileSha(token) {
+      try {
+        const checkUrl = 'https://api.github.com/repos/' + GITHUB_REPO_OWNER + '/' + GITHUB_REPO_NAME + '/contents/' + GITHUB_CLOUD_FILE + '?ref=' + GITHUB_CLOUD_BRANCH + '&_t=' + Date.now();
+        const getRes = await fetch(checkUrl, {
+          cache: 'no-store',
+          headers: {
+            'Authorization': 'token ' + token,
+            'Accept': 'application/vnd.github.v3+json',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache'
+          }
+        });
+        if (getRes.ok) {
+          const fileData = await getRes.json();
+          return fileData.sha || null;
+        }
+      } catch(e) {
+        console.warn('Error fetching SHA:', e);
+      }
+      return null;
+    }
+
+    let isCloudPushInProgress = false;
+    let pendingCloudPush = false;
+
+    async function pushToGitHubCloud(showFeedback = false, retryAttempt = 0) {
       const token = getGitHubToken();
       if (!token) return false;
 
+      if (isCloudPushInProgress) {
+        pendingCloudPush = true;
+        return false;
+      }
+
+      isCloudPushInProgress = true;
       isSyncing = true;
       updateCloudStatusUI();
 
       try {
-        let fileSha = null;
-        try {
-          const checkUrl = 'https://api.github.com/repos/' + GITHUB_REPO_OWNER + '/' + GITHUB_REPO_NAME + '/contents/' + GITHUB_CLOUD_FILE + '?ref=' + GITHUB_CLOUD_BRANCH;
-          const getRes = await fetch(checkUrl, {
-            headers: {
-              'Authorization': 'token ' + token,
-              'Accept': 'application/vnd.github.v3+json'
-            }
-          });
-          if (getRes.ok) {
-            const fileData = await getRes.json();
-            fileSha = fileData.sha;
-          }
-        } catch(e) {}
+        let fileSha = await getLatestFileSha(token);
 
         const payload = {
           version: '3.2',
@@ -1755,10 +1773,12 @@
         const putUrl = 'https://api.github.com/repos/' + GITHUB_REPO_OWNER + '/' + GITHUB_REPO_NAME + '/contents/' + GITHUB_CLOUD_FILE;
         const putRes = await fetch(putUrl, {
           method: 'PUT',
+          cache: 'no-store',
           headers: {
             'Authorization': 'token ' + token,
             'Accept': 'application/vnd.github.v3+json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache, no-store'
           },
           body: JSON.stringify(bodyObj)
         });
@@ -1766,19 +1786,31 @@
         if (putRes.ok) {
           const nowStr = new Date().toLocaleString('ru');
           localStorage.setItem('tennis_last_cloud_sync', nowStr);
+          isCloudPushInProgress = false;
           isSyncing = false;
           updateCloudStatusUI();
           showCloudToast('Тренировки сохранены в облако GitHub!', true, '☁️');
+          if (pendingCloudPush) {
+            pendingCloudPush = false;
+            setTimeout(() => triggerAutoCloudSync(), 500);
+          }
           return true;
+        } else if (putRes.status === 409 && retryAttempt < 3) {
+          console.warn('409 Conflict: retrying push with fresh SHA (attempt ' + (retryAttempt + 1) + ')...');
+          isCloudPushInProgress = false;
+          await new Promise(r => setTimeout(r, 600));
+          return await pushToGitHubCloud(showFeedback, retryAttempt + 1);
         } else {
-          const errData = await putRes.json();
+          const errData = await putRes.json().catch(() => ({ message: putRes.statusText }));
+          isCloudPushInProgress = false;
           isSyncing = false;
           updateCloudStatusUI();
-          if (showFeedback) alert('Ошибка сохранения в облако (' + putRes.status + '): ' + errData.message);
-          showCloudToast('Ошибка синхронизации с облаком', false, '⚠️');
+          if (showFeedback) alert('Ошибка сохранения в облако (' + putRes.status + '): ' + (errData.message || ''));
+          showCloudToast('Ошибка синхронизации (' + putRes.status + ')', false, '⚠️');
           return false;
         }
       } catch(err) {
+        isCloudPushInProgress = false;
         isSyncing = false;
         updateCloudStatusUI();
         if (showFeedback) alert('Ошибка сети при синхронизации: ' + err.message);
@@ -1798,7 +1830,7 @@
           headers['Authorization'] = 'token ' + token;
         }
 
-        const res = await fetch(url, { headers });
+        const res = await fetch(url, { cache: 'no-store', headers });
         if (!res.ok) {
           isSyncing = false;
           updateCloudStatusUI();
@@ -1854,9 +1886,13 @@
       }
     }
 
+    let autoSyncTimer = null;
     function triggerAutoCloudSync() {
       if (autoSyncEnabled && getGitHubToken()) {
-        pushToGitHubCloud(false);
+        if (autoSyncTimer) clearTimeout(autoSyncTimer);
+        autoSyncTimer = setTimeout(() => {
+          pushToGitHubCloud(false);
+        }, 800);
       }
     }
 
