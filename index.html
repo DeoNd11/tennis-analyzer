@@ -1818,21 +1818,38 @@
       updateCloudStatusUI();
 
       try {
-        let url = 'https://raw.githubusercontent.com/' + GITHUB_REPO_OWNER + '/' + GITHUB_REPO_NAME + '/' + GITHUB_CLOUD_BRANCH + '/' + GITHUB_CLOUD_FILE + '?t=' + Date.now();
-        let headers = {};
-        const token = getGitHubToken();
-        if (token) {
-          headers['Authorization'] = 'token ' + token;
+        let data = null;
+
+        // 1. Primary method: Fetch from raw GitHub CDN (fastest, no preflight CORS issues, public repo)
+        try {
+          const rawUrl = 'https://raw.githubusercontent.com/' + GITHUB_REPO_OWNER + '/' + GITHUB_REPO_NAME + '/' + GITHUB_CLOUD_BRANCH + '/' + GITHUB_CLOUD_FILE + '?_t=' + Date.now();
+          const rawRes = await fetch(rawUrl);
+          if (rawRes.ok) {
+            data = await rawRes.json();
+          }
+        } catch(rawErr) {
+          console.warn('Raw CDN fetch failed, trying API fallback:', rawErr);
         }
 
-        const res = await fetch(url, { headers });
-        if (!res.ok) {
-          isSyncing = false;
-          updateCloudStatusUI();
-          return false;
+        // 2. Fallback method: GitHub REST API (supports token authorization with valid CORS)
+        if (!data) {
+          const token = getGitHubToken();
+          const apiUrl = 'https://api.github.com/repos/' + GITHUB_REPO_OWNER + '/' + GITHUB_REPO_NAME + '/contents/' + GITHUB_CLOUD_FILE + '?ref=' + GITHUB_CLOUD_BRANCH + '&_t=' + Date.now();
+          const apiHeaders = { 'Accept': 'application/vnd.github.v3+json' };
+          if (token) apiHeaders['Authorization'] = 'token ' + token;
+
+          const apiRes = await fetch(apiUrl, { headers: apiHeaders });
+          if (apiRes.ok) {
+            const fileJson = await apiRes.json();
+            if (fileJson && fileJson.content) {
+              const cleanBase64 = fileJson.content.replace(/s/g, '');
+              const bytes = Uint8Array.from(atob(cleanBase64), c => c.charCodeAt(0));
+              const decodedStr = new TextDecoder('utf-8').decode(bytes);
+              data = JSON.parse(decodedStr);
+            }
+          }
         }
 
-        const data = await res.json();
         if (data && data.sessions && Array.isArray(data.sessions) && data.sessions.length > 0) {
           sessions = data.sessions;
           if (data.rackets && Array.isArray(data.rackets)) {
@@ -1866,6 +1883,7 @@
         updateCloudStatusUI();
         return false;
       } catch(e) {
+        console.error('Error pulling from cloud:', e);
         isSyncing = false;
         updateCloudStatusUI();
         return false;
