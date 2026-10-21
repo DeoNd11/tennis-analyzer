@@ -1,6 +1,6 @@
 {
   "version": "3.2",
-  "updatedAt": "2026-10-21T21:40:40.235Z",
+  "updatedAt": "2026-10-21T21:41:37.858Z",
   "physicsMultiplier": 1.4,
   "rackets": [
     {
@@ -20,6 +20,12 @@
       "name": "wilson burn 95 countervail",
       "specs": "309g, 16x20",
       "color": "#8b5cf6"
+    },
+    {
+      "id": "racket_1792618896323",
+      "name": "Head Speed Pro Legend",
+      "specs": "49, 310, 18+20",
+      "color": "#f97316"
     }
   ],
   "sessions": [
