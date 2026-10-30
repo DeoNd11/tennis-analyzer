@@ -1,6 +1,6 @@
 {
   "version": "3.2",
-  "updatedAt": "2026-10-30T19:28:27.745Z",
+  "updatedAt": "2026-10-30T19:28:50.786Z",
   "physicsMultiplier": 1.4,
   "rackets": [
     {
@@ -14984,7 +14984,7 @@
       }
     },
     {
-      "id": "sess_1793388499376_yes4",
+      "id": "sess_1793388529455_iagt",
       "name": "20261030_1516_Denis_Practice.csv",
       "date": "2026-10-30 15:16",
       "shots": [
@@ -22346,7 +22346,7 @@
         }
       ],
       "racketMap": {
-        "0": "racket_1793388448194"
+        "0": "racket_1792446972684"
       }
     }
   ]
