@@ -792,6 +792,75 @@
       transform: scale(1.15);
     }
 
+    /* Language Switcher */
+    .lang-switch {
+      display: inline-flex;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 3px;
+      gap: 2px;
+    }
+    .lang-btn {
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .lang-btn:hover {
+      color: #fff;
+    }
+    .lang-btn.active {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+    }
+
+    /* Metric Pills */
+    .metric-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .metric-pill {
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 6px;
+      background: #090d16;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .metric-pill:hover {
+      border-color: #3b82f6;
+      color: #fff;
+    }
+    .metric-pill.active {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: #3b82f6;
+      color: #60a5fa;
+    }
+
+    .angle-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .angle-up { background: rgba(16, 185, 129, 0.16); color: #34d399; }
+    .angle-flat { background: rgba(59, 130, 246, 0.16); color: #60a5fa; }
+    .angle-down { background: rgba(245, 158, 11, 0.16); color: #fbbf24; }
+
     .hidden { display: none !important; }
   </style>
 </head>
@@ -803,116 +872,147 @@
       <div class="brand-icon">🎾</div>
       <div>
         <h1>Tennis Swing Analyser</h1>
-        <p>Анализ тренировок, сравнение ракеток и автосохранение в облако</p>
+        <p data-i18n="headerSubtitle">Анализ тренировок, спина, углов удара, сравнение ракеток и облако</p>
       </div>
     </div>
 
     <!-- Physics settings & Actions -->
     <div class="header-actions">
+      <div class="lang-switch" title="Language / Язык">
+        <button class="lang-btn active" id="langBtnRu" onclick="setLanguage('ru')">🇷🇺 RU</button>
+        <button class="lang-btn" id="langBtnEn" onclick="setLanguage('en')">🇬🇧 EN</button>
+      </div>
+
       <div class="physics-control">
-        <span class="physics-label">Физика соударения:</span>
+        <span class="physics-label" data-i18n="physicsLabel">Физика соударения:</span>
         <div class="physics-slider">
           <input type="range" id="physicsFactor" min="1.2" max="1.6" step="0.02" value="1.40">
           <span class="physics-val" id="physicsFactorVal">×1.40</span>
         </div>
       </div>
 
-      <button class="btn btn-cloud" id="cloudSyncBtn" onclick="openCloudModal()" title="Настройка облачной синхронизации с GitHub">
+      <button class="btn btn-cloud" id="cloudSyncBtn" onclick="openCloudModal()" data-i18n-title="cloudBtnTitle" title="Настройка облачной синхронизации с GitHub">
         <span id="cloudStatusIcon">☁️</span>
         <span id="cloudStatusText">Облако GitHub</span>
       </button>
 
       <button class="btn btn-purple" id="manageRacketsBtn" onclick="openRacketModal()">
-        <span>🎾 Мои ракетки</span>
+        <span data-i18n="btnMyRackets">🎾 Мои ракетки</span>
       </button>
 
       <div class="upload-btn-wrap">
         <button class="btn btn-primary">
-          <span>📂 Добавить .xlsx</span>
+          <span data-i18n="btnAddXlsx">📂 Добавить .xlsx</span>
           <input type="file" id="fileInput" multiple accept=".xlsx,.xls,.csv">
         </button>
       </div>
 
-      <button class="btn btn-secondary" onclick="exportBackup()" title="Сохранить резервную копию всех тренировок и ракеток">
-        <span>💾 Бэкап</span>
+      <button class="btn btn-secondary" onclick="exportBackup()" data-i18n-title="btnBackupTitle" title="Сохранить резервную копию всех тренировок и ракеток">
+        <span data-i18n="btnBackup">💾 Бэкап</span>
       </button>
 
       <div class="upload-btn-wrap">
-        <button class="btn btn-secondary" title="Восстановить из файла резервной копии .json">
-          <span>📥 Восстановить</span>
+        <button class="btn btn-secondary" data-i18n-title="btnRestoreTitle" title="Восстановить из файла резервной копии .json">
+          <span data-i18n="btnRestore">📥 Восстановить</span>
           <input type="file" id="backupFileInput" accept=".json" onchange="handleBackupFile(this)">
         </button>
       </div>
 
-      <button class="btn btn-secondary" id="resetDemoBtn" onclick="resetDemoData()">Denis (2 дня)</button>
-      <button class="btn btn-danger" id="clearAllBtn" onclick="clearAllData()">Очистить</button>
+      <button class="btn btn-secondary" id="resetDemoBtn" onclick="resetDemoData()" data-i18n="btnDemo">Denis (2 дня)</button>
+      <button class="btn btn-danger" id="clearAllBtn" onclick="clearAllData()" data-i18n="btnClear">Очистить</button>
     </div>
   </header>
 
   <!-- Drag and drop zone -->
   <div class="drop-zone" id="dropZone">
     <div style="font-size: 24px; margin-bottom: 2px;">📥</div>
-    <strong>Перетащите сюда новые файлы тренировок из Tennis Swing Analyser (.xlsx)</strong>
-    <p>Поддерживается одновременная загрузка нескольких тренировок с автосохранением в облако GitHub.</p>
+    <strong data-i18n="dropZoneTitle">Перетащите сюда новые файлы тренировок из Tennis Swing Analyser (.xlsx)</strong>
+    <p data-i18n="dropZoneSub">Поддерживается одновременная загрузка нескольких тренировок с автосохранением в облако GitHub.</p>
   </div>
 
   <!-- Navigation Tabs & Mode selection -->
   <div class="tabs-bar">
     <div class="nav-tabs">
       <button class="nav-tab active" id="tabSingle" onclick="switchViewMode('single')">
-        <span class="tab-icon">📊</span> Обзор тренировки
+        <span class="tab-icon">📊</span> <span data-i18n="tabSingle">Обзор тренировки</span>
+      </button>
+      <button class="nav-tab" id="tabSpin" onclick="switchViewMode('spin')">
+        <span class="tab-icon">🌀</span> <span data-i18n="tabSpin">Спин и угол удара</span>
       </button>
       <button class="nav-tab" id="tabCompare" onclick="switchViewMode('compare')">
-        <span class="tab-icon">⚖️</span> Сравнение 2-х сессий
+        <span class="tab-icon">⚖️</span> <span data-i18n="tabCompare">Сравнение 2-х сессий</span>
       </button>
       <button class="nav-tab" id="tabRackets" onclick="switchViewMode('rackets')">
-        <span class="tab-icon">🎾</span> Сравнение ракеток
+        <span class="tab-icon">🎾</span> <span data-i18n="tabRackets">Сравнение ракеток</span>
       </button>
       <button class="nav-tab" id="tabDynamics" onclick="switchViewMode('dynamics')">
-        <span class="tab-icon">📈</span> Динамика по дням
+        <span class="tab-icon">📈</span> <span data-i18n="tabDynamics">Динамика по дням</span>
       </button>
     </div>
 
     <div class="session-selectors">
       <!-- Single Mode Selectors -->
       <div class="select-group" id="singleSelectorGroup">
-        <span class="select-label">Сессия:</span>
+        <span class="select-label" data-i18n="lblSession">Сессия:</span>
         <select id="singleSessionSelect"></select>
-        <span class="select-label" style="margin-left: 8px;">Ракетка:</span>
+        <span class="select-label" style="margin-left: 8px;" data-i18n="lblRacket">Ракетка:</span>
         <select id="singleRacketFilter">
-          <option value="all">Все ракетки</option>
+          <option value="all" data-i18n="optAllRackets">Все ракетки</option>
+        </select>
+      </div>
+
+      <!-- Spin & Angle Mode Selectors -->
+      <div class="select-group hidden" id="spinSelectorGroup">
+        <span class="select-label" data-i18n="lblSession">Сессия:</span>
+        <select id="spinSessionFilter">
+          <option value="all" data-i18n="optAllSessions">Все тренировки</option>
+        </select>
+        <span class="select-label" style="margin-left: 6px;" data-i18n="lblRacket">Ракетка:</span>
+        <select id="spinRacketFilter">
+          <option value="all" data-i18n="optAllRackets">Все ракетки</option>
+        </select>
+        <span class="select-label" style="margin-left: 6px;" data-i18n="lblShots">Удары:</span>
+        <select id="spinShotFilter">
+          <option value="all" data-i18n="optAllShots">Все типы ударов</option>
+          <option value="fh_topspin" data-i18n="optFhTopspin">Форхенд топспин</option>
+          <option value="fh_flat" data-i18n="optFhFlat">Форхенд плоский</option>
+          <option value="bh_topspin" data-i18n="optBhTopspin">Бэкхенд топспин</option>
+          <option value="bh_flat" data-i18n="optBhFlat">Бэкхенд плоский</option>
+          <option value="serve" data-i18n="optServe">Подача / Смэш</option>
+          <option value="slice" data-i18n="optSlice">Слайсы / Резаные</option>
+          <option value="volley" data-i18n="optVolley">Удар с лета / Блок</option>
         </select>
       </div>
 
       <!-- Compare Mode Selectors -->
       <div class="select-group hidden" id="compareSelectorGroup">
-        <span class="select-label">Сессия А (Базовая):</span>
+        <span class="select-label" data-i18n="lblSessionA">Сессия А (Базовая):</span>
         <select id="compareSessionA"></select>
-        <span class="select-label" style="margin-left: 6px;">Сессия Б (Новая):</span>
+        <span class="select-label" style="margin-left: 6px;" data-i18n="lblSessionB">Сессия Б (Новая):</span>
         <select id="compareSessionB"></select>
       </div>
 
       <!-- Rackets Mode Selectors -->
       <div class="select-group hidden" id="racketsSelectorGroup">
-        <span class="select-label">Выборка:</span>
+        <span class="select-label" data-i18n="lblSample">Выборка:</span>
         <select id="racketsSessionFilter">
-          <option value="all">Все загруженные тренировки</option>
+          <option value="all" data-i18n="optAllSessions">Все загруженные тренировки</option>
         </select>
       </div>
 
       <!-- Dynamics Mode Selectors -->
       <div class="select-group hidden" id="dynamicsSelectorGroup">
-        <span class="select-label">Ракетка:</span>
+        <span class="select-label" data-i18n="lblRacket">Ракетка:</span>
         <select id="dynamicsRacketFilter">
-          <option value="all">Все ракетки</option>
+          <option value="all" data-i18n="optAllRackets">Все ракетки</option>
         </select>
-        <span class="select-label" style="margin-left: 6px;">Удары:</span>
+        <span class="select-label" style="margin-left: 6px;" data-i18n="lblShots">Удары:</span>
         <select id="dynamicsShotFilter">
-          <option value="all">Все типы ударов</option>
-          <option value="serve">Подача / Смэш</option>
-          <option value="fh_topspin">Форхенд топспин</option>
-          <option value="bh_topspin">Бэкхенд топспин</option>
-          <option value="slice">Слайсы / Резаные</option>
+          <option value="all" data-i18n="optAllShots">Все типы ударов</option>
+          <option value="serve" data-i18n="optServe">Подача / Смэш</option>
+          <option value="fh_topspin" data-i18n="optFhTopspin">Форхенд топспин</option>
+          <option value="bh_topspin" data-i18n="optBhTopspin">Бэкхенд топспин</option>
+          <option value="slice" data-i18n="optSlice">Слайсы / Резаные</option>
         </select>
       </div>
     </div>
@@ -922,33 +1022,33 @@
   <main id="singleView">
     <div class="kpi-grid">
       <div class="kpi-card">
-        <div class="kpi-title">Всего ударов</div>
+        <div class="kpi-title" data-i18n="kpiTotalShots">Всего ударов</div>
         <div class="kpi-main-val" id="kpiShotsCount">0</div>
         <div class="kpi-sub" id="kpiSessionDuration">Время: -</div>
       </div>
 
       <div class="kpi-card">
-        <div class="kpi-title">Средняя скорость маха</div>
+        <div class="kpi-title" data-i18n="kpiAvgSwing">Средняя скорость маха</div>
         <div class="kpi-main-val" id="kpiAvgSwing">0 <span class="kpi-unit">км/ч</span></div>
         <div class="kpi-ball-val" id="kpiAvgBall">⚡ Мяч: ~0 км/ч</div>
       </div>
 
       <div class="kpi-card purple">
-        <div class="kpi-title">Макс. зафиксированная скорость</div>
+        <div class="kpi-title" data-i18n="kpiMaxSwing">Макс. зафиксированная скорость</div>
         <div class="kpi-main-val" id="kpiMaxSwing">0 <span class="kpi-unit">км/ч</span></div>
         <div class="kpi-ball-val" id="kpiMaxBall">⚡ Мяч: ~0 км/ч</div>
         <div class="kpi-sub" id="kpiMaxType">-</div>
       </div>
 
       <div class="kpi-card amber">
-        <div class="kpi-title">Подача (Serve / Smash)</div>
+        <div class="kpi-title" data-i18n="kpiServe">Подача (Serve / Smash)</div>
         <div class="kpi-main-val" id="kpiServeAvg">0 <span class="kpi-unit">км/ч</span></div>
         <div class="kpi-ball-val" id="kpiServeBall">⚡ Мяч: ~0 км/ч</div>
         <div class="kpi-sub" id="kpiServeMax">Макс мах: 0 км/ч</div>
       </div>
 
       <div class="kpi-card cyan">
-        <div class="kpi-title">Баланс ударов</div>
+        <div class="kpi-title" data-i18n="kpiBalance">Баланс ударов</div>
         <div class="kpi-main-val" id="kpiBalanceRatio">-</div>
         <div class="kpi-sub" id="kpiDominantHand">Доминирует: -</div>
       </div>
@@ -958,8 +1058,8 @@
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">📈 Хронология ударов и этапы (Mark)</div>
-            <div class="card-subtitle">Скорость маха каждого удара во времени + привязка к используемой ракетке</div>
+            <div class="card-title" data-i18n="chartTimelineTitle">📈 Хронология ударов и этапы (Mark)</div>
+            <div class="card-subtitle" data-i18n="chartTimelineSub">Скорость маха каждого удара во времени + привязка к используемой ракетке</div>
           </div>
         </div>
         <div class="chart-container" style="height: 330px;">
@@ -970,8 +1070,8 @@
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">🎯 Распределение арсенала ударов</div>
-            <div class="card-subtitle">Соотношение Flat / Topspin / Slice / Serve</div>
+            <div class="card-title" data-i18n="chartDonutTitle">🎯 Распределение арсенала ударов</div>
+            <div class="card-subtitle" data-i18n="chartDonutSub">Соотношение Flat / Topspin / Slice / Serve</div>
           </div>
         </div>
         <div class="chart-container" style="height: 330px;">
@@ -983,8 +1083,8 @@
     <div class="card" style="margin-bottom: 24px;">
       <div class="card-header">
         <div>
-          <div class="card-title">🏷️ Анализ этапов и привязка ракеток (Mark Breakdown)</div>
-          <div class="card-subtitle">Каждая смена Mark фиксирует этап тренировки. Назначьте ракетку для каждого этапа — выбор сохранится в программе и облаке.</div>
+          <div class="card-title" data-i18n="marksTitle">🏷️ Анализ этапов и привязка ракеток (Mark Breakdown)</div>
+          <div class="card-subtitle" data-i18n="marksSub">Каждая смена Mark фиксирует этап тренировки. Назначьте ракетку для каждого этапа — выбор сохранится в программе и облаке.</div>
         </div>
       </div>
       <div class="mark-grid" id="marksGridContainer"></div>
@@ -993,26 +1093,156 @@
     <div class="card" style="margin-bottom: 24px;">
       <div class="card-header">
         <div>
-          <div class="card-title">📋 Сводная таблица по типам ударов</div>
-          <div class="card-subtitle">Кликните на заголовок колонки для сортировки</div>
+          <div class="card-title" data-i18n="shotTableTitle">📋 Сводная таблица по типам ударов</div>
+          <div class="card-subtitle" data-i18n="shotTableSub">Кликните на заголовок колонки для сортировки</div>
         </div>
       </div>
       <div class="table-container">
         <table id="shotTypesTable">
           <thead>
             <tr>
-              <th onclick="sortShotTable('shotType')">Тип удара</th>
-              <th onclick="sortShotTable('count')">Количество</th>
-              <th onclick="sortShotTable('share')">Доля арсенала</th>
-              <th onclick="sortShotTable('avgSwing')">Ср. мах (км/ч)</th>
-              <th onclick="sortShotTable('avgBall')">Ср. мяч (км/ч)</th>
-              <th onclick="sortShotTable('maxSwing')">Пик мах (км/ч)</th>
-              <th onclick="sortShotTable('maxBall')">Пик мяч (км/ч)</th>
-              <th onclick="sortShotTable('avgWristRot')">Ср. вращение кисти (rpm)</th>
-              <th onclick="sortShotTable('avgDuration')">Ср. замах (мс)</th>
+              <th onclick="sortShotTable('shotType')" data-i18n="colShotType">Тип удара</th>
+              <th onclick="sortShotTable('count')" data-i18n="colCount">Количество</th>
+              <th onclick="sortShotTable('share')" data-i18n="colShare">Доля арсенала</th>
+              <th onclick="sortShotTable('avgSwing')" data-i18n="colAvgSwing">Ср. мах</th>
+              <th onclick="sortShotTable('avgBall')" data-i18n="colAvgBall">Ср. мяч</th>
+              <th onclick="sortShotTable('maxSwing')" data-i18n="colMaxSwing">Пик мах</th>
+              <th onclick="sortShotTable('avgAngle')" data-i18n="colAvgAngle">Ср. угол (°)</th>
+              <th onclick="sortShotTable('avgWristRot')" data-i18n="colAvgWristRot">Вращение кисти (rpm)</th>
+              <th onclick="sortShotTable('avgEstSpin')" data-i18n="colEstSpin">Спин (~rpm)</th>
+              <th onclick="sortShotTable('avgDuration')" data-i18n="colAvgDuration">Ср. замах</th>
             </tr>
           </thead>
           <tbody id="shotTypesTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= 1.5 SPIN & IMPACT ANGLE VIEW ================= -->
+  <main id="spinView" class="hidden">
+    <div class="verdict-box">
+      <div class="verdict-header">
+        <span>🌀</span>
+        <span data-i18n="spinVerdictTitle">Биомеханика спина и траектории замаха (Spin &amp; Angle Insights)</span>
+      </div>
+      <div class="verdict-list" id="spinVerdictList"></div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-title" data-i18n="kpiSpinAvgAngle">Ср. угол атаки / замаха</div>
+        <div class="kpi-main-val" id="spinKpiAvgAngle">0°</div>
+        <div class="kpi-sub" id="spinKpiAngleProfile">-</div>
+      </div>
+
+      <div class="kpi-card blue">
+        <div class="kpi-title" data-i18n="kpiSpinFhGap">Угол FH Topspin vs Flat</div>
+        <div class="kpi-main-val" id="spinKpiFhAngles">-</div>
+        <div class="kpi-sub" id="spinKpiFhGap">-</div>
+      </div>
+
+      <div class="kpi-card cyan">
+        <div class="kpi-title" data-i18n="kpiSpinWristRot">Ср. вращение кисти</div>
+        <div class="kpi-main-val" id="spinKpiWristRot">0 <span class="kpi-unit">rpm</span></div>
+        <div class="kpi-sub" id="spinKpiWristTopspin">-</div>
+      </div>
+
+      <div class="kpi-card purple">
+        <div class="kpi-title" data-i18n="kpiSpinEstRpm">Оценка спина мяча</div>
+        <div class="kpi-main-val" id="spinKpiEstSpin">~0 <span class="kpi-unit">rpm</span></div>
+        <div class="kpi-sub" id="spinKpiPeakSpin">-</div>
+      </div>
+
+      <div class="kpi-card amber">
+        <div class="kpi-title" data-i18n="kpiSpinElevArm">Подъем кисти / Разброс</div>
+        <div class="kpi-main-val" id="spinKpiWristElev">0 <span class="kpi-unit">rpm</span></div>
+        <div class="kpi-sub" id="spinKpiArmVar">-</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title" data-i18n="spinScatterTitle">🎯 Карта ударов: Скорость vs Угол атаки (°)</div>
+            <div class="card-subtitle" data-i18n="spinScatterSub">Разделение ударов по траектории: Слайс (&lt;-10°), Плоский (-10°..+15°), Топспин (&gt;+15°)</div>
+          </div>
+        </div>
+        <div class="chart-container" style="height: 360px;">
+          <canvas id="spinScatterChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title" data-i18n="spinMechTitle">📐 Механика по типам ударов</div>
+            <div class="card-subtitle" data-i18n="spinMechSub">Угол замаха (°), вращение кисти и подъем для каждого удара</div>
+          </div>
+          <div class="metric-pills" id="spinMechMetricPills">
+            <button class="metric-pill active" onclick="setSpinMechMetric('angle')" id="pillSpinAngle" data-i18n="pillAngle">Угол (°)</button>
+            <button class="metric-pill" onclick="setSpinMechMetric('wristRot')" id="pillSpinWrist" data-i18n="pillWristRot">Кисть (rpm)</button>
+            <button class="metric-pill" onclick="setSpinMechMetric('wristElev')" id="pillSpinElev" data-i18n="pillWristElev">Подъем (rpm)</button>
+            <button class="metric-pill" onclick="setSpinMechMetric('estSpin')" id="pillSpinEst" data-i18n="pillEstSpin">Спин (~rpm)</button>
+          </div>
+        </div>
+        <div class="chart-container" style="height: 360px;">
+          <canvas id="spinMechanicsChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title" data-i18n="spinHistTitle">📊 Распределение углов удара (°)</div>
+            <div class="card-subtitle" data-i18n="spinHistSub">Частота ударов в каждом диапазоне угла траектории замаха</div>
+          </div>
+        </div>
+        <div class="chart-container" style="height: 320px;">
+          <canvas id="spinAngleHistChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title" data-i18n="spinRacketTitle">🎾 Спин и угол атаки по ракеткам</div>
+            <div class="card-subtitle" data-i18n="spinRacketSub">Сравнение угла замаха (°) и оценки вращения (~rpm) для каждой ракетки</div>
+          </div>
+        </div>
+        <div class="chart-container" style="height: 320px;">
+          <canvas id="spinRacketChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 24px;">
+      <div class="card-header">
+        <div>
+          <div class="card-title" data-i18n="spinTableTitle">🔬 Детальная таблица спина, вращения и углов удара</div>
+          <div class="card-subtitle" data-i18n="spinTableSub">Кликните по колонке для сортировки &bull; Включены компоненты сенсора (Кисть, Подъем, Рука)</div>
+        </div>
+      </div>
+      <div class="table-container">
+        <table id="spinTable">
+          <thead>
+            <tr>
+              <th onclick="sortSpinTable('shotType')" data-i18n="colShotType">Тип удара</th>
+              <th onclick="sortSpinTable('count')" data-i18n="colCount">Кол-во</th>
+              <th onclick="sortSpinTable('avgSwing')" data-i18n="colAvgSwing">Ср. мах</th>
+              <th onclick="sortSpinTable('avgAngle')" data-i18n="colAvgAngle">Ср. угол (°)</th>
+              <th onclick="sortSpinTable('angleRange')" data-i18n="colAngleType">Траектория</th>
+              <th onclick="sortSpinTable('avgWristRot')" data-i18n="colWristRot">Кисть (rpm)</th>
+              <th onclick="sortSpinTable('avgWristElev')" data-i18n="colWristElev">Подъем кисти (rpm)</th>
+              <th onclick="sortSpinTable('avgArmRot')" data-i18n="colArmRot">Вращение руки (rpm)</th>
+              <th onclick="sortSpinTable('avgEstSpin')" data-i18n="colEstSpin">Оценка спина (~rpm)</th>
+              <th onclick="sortSpinTable('avgVariance')" data-i18n="colVariance">Разброс (Var)</th>
+            </tr>
+          </thead>
+          <tbody id="spinTableBody"></tbody>
         </table>
       </div>
     </div>
@@ -1023,39 +1253,61 @@
     <div class="verdict-box">
       <div class="verdict-header">
         <span>🏆</span>
-        <span>Автоматический вердикт и анализ прогресса</span>
+        <span data-i18n="cmpVerdictTitle">Автоматический вердикт и анализ прогресса</span>
       </div>
       <div class="verdict-list" id="verdictList"></div>
     </div>
 
-    <div class="card" style="margin-bottom: 24px;">
-      <div class="card-header">
-        <div>
-          <div class="card-title">📊 Сравнение средней скорости маха по типам ударов</div>
-          <div class="card-subtitle">Сессия А vs Сессия Б (км/ч)</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title" data-i18n="cmpChart1Title">📊 Сравнение по типам ударов (Сессия А vs Б)</div>
+            <div class="card-subtitle" data-i18n="cmpChart1Sub">Выберите метрику для сравнения по всем видам ударов</div>
+          </div>
+          <select id="compareMetricSelect" onchange="renderCompareView()" style="font-size: 12px; padding: 5px 8px;">
+            <option value="swingSpeed" data-i18n="metricSwingSpeed">Скорость маха (kph)</option>
+            <option value="swingAngle" data-i18n="metricSwingAngle">Угол удара (°)</option>
+            <option value="estSpin" data-i18n="metricEstSpin">Оценка спина (~rpm)</option>
+            <option value="wristRot" data-i18n="metricWristRot">Вращение кисти (rpm)</option>
+            <option value="wristElev" data-i18n="metricWristElev">Подъем кисти (rpm)</option>
+            <option value="variance" data-i18n="metricVariance">Разброс (Variance)</option>
+          </select>
+        </div>
+        <div class="chart-container" style="height: 340px;">
+          <canvas id="compareBarChart"></canvas>
         </div>
       </div>
-      <div class="chart-container" style="height: 340px;">
-        <canvas id="compareBarChart"></canvas>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title" data-i18n="cmpChart2Title">🌀 Сравнение угла атаки и спина (А vs Б)</div>
+            <div class="card-subtitle" data-i18n="cmpChart2Sub">Изменение угла замаха (°) и оценки спина (~rpm) по типам ударов</div>
+          </div>
+        </div>
+        <div class="chart-container" style="height: 340px;">
+          <canvas id="compareAngleSpinChart"></canvas>
+        </div>
       </div>
     </div>
 
     <div class="card" style="margin-bottom: 24px;">
       <div class="card-header">
         <div>
-          <div class="card-title">⚖️ Детальная сравнительная таблица «Бок о бок»</div>
-          <div class="card-subtitle">Сравнение объемов, скорости маха, расчетной скорости мяча и вращения</div>
+          <div class="card-title" data-i18n="cmpTableTitle">⚖️ Детальная сравнительная таблица «Бок о бок»</div>
+          <div class="card-subtitle" data-i18n="cmpTableSub">Сравнение объемов, скорости маха, угла атаки, вращения кисти и стабильности</div>
         </div>
       </div>
       <div class="table-container">
         <table id="compareTable">
           <thead>
             <tr>
-              <th>Параметр / Тип удара</th>
+              <th data-i18n="colParamShot">Параметр / Тип удара</th>
               <th id="thSessionA">Сессия А</th>
               <th id="thSessionB">Сессия Б</th>
-              <th>Дельта (Δ Изменение)</th>
-              <th>Динамика</th>
+              <th data-i18n="colDelta">Дельта (Δ Изменение)</th>
+              <th data-i18n="colDynamics">Динамика</th>
             </tr>
           </thead>
           <tbody id="compareTableBody"></tbody>
@@ -1069,7 +1321,7 @@
     <div class="verdict-box">
       <div class="verdict-header">
         <span>🏆</span>
-        <span>Автоматический бенчмарк и вердикт по ракеткам</span>
+        <span data-i18n="rktVerdictTitle">Автоматический бенчмарк и вердикт по ракеткам</span>
       </div>
       <div class="verdict-list" id="racketsVerdictList"></div>
     </div>
@@ -1080,9 +1332,16 @@
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">📊 Сравнение скорости маха ракеток по ударам</div>
-            <div class="card-subtitle">Сравнение средней скорости маха (км/ч) для каждого типа удара</div>
+            <div class="card-title" data-i18n="rktSpeedChartTitle">📊 Сравнение ракеток по типам ударов</div>
+            <div class="card-subtitle" data-i18n="rktSpeedChartSub">Выберите метрику: скорость, угол замаха, спин или контроль</div>
           </div>
+          <select id="racketsMetricSelect" onchange="renderRacketsView()" style="font-size: 12px; padding: 5px 8px;">
+            <option value="swingSpeed" data-i18n="metricSwingSpeed">Скорость маха (kph)</option>
+            <option value="swingAngle" data-i18n="metricSwingAngle">Угол удара (°)</option>
+            <option value="estSpin" data-i18n="metricEstSpin">Оценка спина (~rpm)</option>
+            <option value="wristRot" data-i18n="metricWristRot">Вращение кисти (rpm)</option>
+            <option value="variance" data-i18n="metricVariance">Разброс (Variance)</option>
+          </select>
         </div>
         <div class="chart-container" style="height: 350px;">
           <canvas id="racketsSpeedChart"></canvas>
@@ -1092,8 +1351,8 @@
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">🕸️ Профиль и характер ракеток (Радарный тест)</div>
-            <div class="card-subtitle">Сравнение Мощи, Вращения, Подачи, Контроля и Объема</div>
+            <div class="card-title" data-i18n="rktProfileTitle">🕸️ Профиль и характер ракеток (Радарный тест)</div>
+            <div class="card-subtitle" data-i18n="rktProfileSub">Сравнение Мощи, Вращения, Подачи, Контроля и Угла атаки</div>
           </div>
         </div>
         <div class="chart-container" style="height: 350px;">
@@ -1105,24 +1364,24 @@
     <div class="card" style="margin-bottom: 24px;">
       <div class="card-header">
         <div>
-          <div class="card-title">📋 Сводная матрица сравнения ракеток</div>
-          <div class="card-subtitle">Все физические и технические метрики по каждой модели ракетки</div>
+          <div class="card-title" data-i18n="rktTableTitle">📋 Сводная матрица сравнения ракеток</div>
+          <div class="card-subtitle" data-i18n="rktTableSub">Все физические и технические метрики по каждой модели ракетки</div>
         </div>
       </div>
       <div class="table-container">
         <table id="racketsTable">
           <thead>
             <tr>
-              <th>Ракетка</th>
-              <th>Спецификации</th>
-              <th>Всего ударов</th>
-              <th>Ср. мах (км/ч)</th>
-              <th>Расчетный мяч (км/ч)</th>
-              <th>Пик мах (км/ч)</th>
-              <th>Ср. вращение (rpm)</th>
-              <th>Ср. подача (км/ч)</th>
-              <th>FH Топспин (км/ч | rpm)</th>
-              <th>Ср. замах (мс)</th>
+              <th data-i18n="colRacket">Ракетка</th>
+              <th data-i18n="colSpecs">Спецификации</th>
+              <th data-i18n="colTotalShots">Всего ударов</th>
+              <th data-i18n="colAvgSwing">Ср. мах</th>
+              <th data-i18n="colAvgBall">Расч. мяч</th>
+              <th data-i18n="colAvgAngle">Ср. угол (°)</th>
+              <th data-i18n="colEstSpin">Спин (~rpm)</th>
+              <th data-i18n="colAvgServe">Подача</th>
+              <th data-i18n="colFhTopspin">FH Топспин</th>
+              <th data-i18n="colVariance">Разброс (Var)</th>
             </tr>
           </thead>
           <tbody id="racketsTableBody"></tbody>
@@ -1135,44 +1394,44 @@
   <main id="dynamicsView" class="hidden">
     <div class="dynamics-controls">
       <div>
-        <div style="font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 6px;">
+        <div style="font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 6px;" data-i18n="dynSelectDays">
           📅 Выберите тренировочные дни для анализа динамики:
         </div>
         <div class="session-chips-container" id="dynamicsSessionChips"></div>
       </div>
       <div style="display: flex; gap: 8px;">
-        <button class="btn btn-secondary" onclick="selectAllDynamicsDays(true)">Выбрать все</button>
-        <button class="btn btn-secondary" onclick="selectAllDynamicsDays(false)">Сбросить</button>
+        <button class="btn btn-secondary" onclick="selectAllDynamicsDays(true)" data-i18n="btnSelectAll">Выбрать все</button>
+        <button class="btn btn-secondary" onclick="selectAllDynamicsDays(false)" data-i18n="btnReset">Сбросить</button>
       </div>
     </div>
 
     <div class="kpi-grid">
       <div class="kpi-card">
-        <div class="kpi-title">Дней в выборке</div>
+        <div class="kpi-title" data-i18n="kpiDynDays">Дней в выборке</div>
         <div class="kpi-main-val" id="dynKpiDaysCount">0</div>
         <div class="kpi-sub" id="dynKpiDateRange">-</div>
       </div>
 
       <div class="kpi-card">
-        <div class="kpi-title">Всего ударов</div>
+        <div class="kpi-title" data-i18n="kpiTotalShots">Всего ударов</div>
         <div class="kpi-main-val" id="dynKpiTotalShots">0</div>
         <div class="kpi-sub" id="dynKpiAvgShotsPerDay">Ср: ~0 уд/день</div>
       </div>
 
       <div class="kpi-card cyan">
-        <div class="kpi-title">Динамика скорости маха</div>
+        <div class="kpi-title" data-i18n="kpiDynSwingDelta">Динамика скорости маха</div>
         <div class="kpi-main-val" id="dynKpiSwingDelta">0 <span class="kpi-unit">км/ч</span></div>
         <div class="kpi-ball-val" id="dynKpiBallDelta">Мяч: 0 км/ч</div>
       </div>
 
       <div class="kpi-card amber">
-        <div class="kpi-title">Динамика подачи</div>
+        <div class="kpi-title" data-i18n="kpiDynServeDelta">Динамика подачи</div>
         <div class="kpi-main-val" id="dynKpiServeDelta">0 <span class="kpi-unit">км/ч</span></div>
         <div class="kpi-sub" id="dynKpiServeAvg">Ср. за период: 0 км/ч</div>
       </div>
 
       <div class="kpi-card purple">
-        <div class="kpi-title">Рекордная скорость периода</div>
+        <div class="kpi-title" data-i18n="kpiDynRecord">Рекордная скорость периода</div>
         <div class="kpi-main-val" id="dynKpiRecordSpeed">0 <span class="kpi-unit">км/ч</span></div>
         <div class="kpi-sub" id="dynKpiRecordDetail">-</div>
       </div>
@@ -1182,11 +1441,11 @@
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">📈 Прогресс скорости маха и мяча во времени</div>
-            <div class="card-subtitle">Динамика по тренировочным дням (км/ч)</div>
+            <div class="card-title" data-i18n="dynChartSpeedTitle">📈 Прогресс скорости маха и мяча во времени</div>
+            <div class="card-subtitle" data-i18n="dynChartSpeedSub">Динамика по тренировочным дням</div>
           </div>
         </div>
-        <div class="chart-container" style="height: 340px;">
+        <div class="chart-container" style="height: 330px;">
           <canvas id="dynamicsSpeedChart"></canvas>
         </div>
       </div>
@@ -1194,36 +1453,50 @@
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">⚡ Прогресс подачи и вращения кисти</div>
-            <div class="card-subtitle">Скорость подачи (км/ч) и вращение кисти на топспинах (rpm)</div>
+            <div class="card-title" data-i18n="dynChartServeTitle">⚡ Прогресс подачи и вращения кисти</div>
+            <div class="card-subtitle" data-i18n="dynChartServeSub">Скорость подачи и вращение кисти на топспинах (rpm)</div>
           </div>
         </div>
-        <div class="chart-container" style="height: 340px;">
+        <div class="chart-container" style="height: 330px;">
           <canvas id="dynamicsServeSpinChart"></canvas>
         </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 20px;">
+      <div class="card-header">
+        <div>
+          <div class="card-title" data-i18n="dynChartAngleTitle">🌀 Динамика угла атаки (°) и стабильности (Variance) по дням</div>
+          <div class="card-subtitle" data-i18n="dynChartAngleSub">Средний угол удара, угол FH Топспина (°) и стабильность замаха (ниже = стабильнее)</div>
+        </div>
+      </div>
+      <div class="chart-container" style="height: 300px;">
+        <canvas id="dynamicsAngleVarChart"></canvas>
       </div>
     </div>
 
     <div class="card" style="margin-bottom: 24px;">
       <div class="card-header">
         <div>
-          <div class="card-title">📜 Хронологическая таблица тренировок и изменений</div>
-          <div class="card-subtitle">Сравнение показателей каждого дня с предыдущим днем (Δ)</div>
+          <div class="card-title" data-i18n="dynTableTitle">📜 Хронологическая таблица тренировок и изменений</div>
+          <div class="card-subtitle" data-i18n="dynTableSub">Сравнение показателей каждого дня с предыдущим днем (Δ)</div>
         </div>
       </div>
       <div class="table-container">
         <table id="dynamicsTable">
           <thead>
             <tr>
-              <th>Дата</th>
-              <th>Тренировка</th>
-              <th>Ударов</th>
-              <th>Ср. мах (км/ч)</th>
-              <th>Расчетный мяч (км/ч)</th>
-              <th>Подача (км/ч)</th>
-              <th>Топспин FH (км/ч | rpm)</th>
-              <th>Использованные ракетки</th>
-              <th>Динамика к пред. дню (Δ)</th>
+              <th data-i18n="colDate">Дата</th>
+              <th data-i18n="colTraining">Тренировка</th>
+              <th data-i18n="colShots">Ударов</th>
+              <th data-i18n="colAvgSwing">Ср. мах</th>
+              <th data-i18n="colAvgBall">Расч. мяч</th>
+              <th data-i18n="colAvgAngle">Ср. угол (°)</th>
+              <th data-i18n="colAvgServe">Подача</th>
+              <th data-i18n="colFhTopspin">Топспин FH</th>
+              <th data-i18n="colVariance">Разброс</th>
+              <th data-i18n="colUsedRackets">Использованные ракетки</th>
+              <th data-i18n="colDeltaPrev">Динамика (Δ)</th>
             </tr>
           </thead>
           <tbody id="dynamicsTableBody"></tbody>
@@ -1243,12 +1516,12 @@
     <div class="modal-card" style="max-width: 640px;">
       <div class="modal-header">
         <div class="modal-title">
-          <span>☁️</span> Облачная синхронизация с GitHub
+          <span>☁️</span> <span data-i18n="cloudModalTitle">Облачная синхронизация с GitHub</span>
         </div>
         <button class="modal-close" onclick="closeCloudModal()">&times;</button>
       </div>
       <div class="modal-body">
-        <div style="font-size: 13px; color: #cbd5e1; margin-bottom: 14px;">
+        <div style="font-size: 13px; color: #cbd5e1; margin-bottom: 14px;" data-i18n-html="cloudModalDesc">
           Автоматически сохраняет все ваши тренировки, историю и ракетки в репозиторий 
           <b style="color: #fff;">DeoNd11/tennis-analyzer</b> в файл <code style="color: var(--accent);">tennis_cloud_database.json</code>.
           Больше не нужно вручную скачивать и загружать файлы бэкапа!
@@ -1256,16 +1529,16 @@
 
         <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between;">
           <div>
-            <div style="font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Статус подключения:</div>
+            <div style="font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;" data-i18n="cloudStatusLabel">Статус подключения:</div>
             <div id="cloudModalStatusText" style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 2px;">
               ⚪ Проверка...
             </div>
             <div id="cloudModalLastSync" style="font-size: 11px; color: var(--text-muted); margin-top: 2px;"></div>
           </div>
-          <button class="btn btn-secondary" onclick="testCloudConnection()" id="cloudTestBtn" style="font-size: 12px;">Проверить связь</button>
+          <button class="btn btn-secondary" onclick="testCloudConnection()" id="cloudTestBtn" style="font-size: 12px;" data-i18n="btnTestConn">Проверить связь</button>
         </div>
 
-        <div class="cloud-steps-box">
+        <div class="cloud-steps-box" data-i18n-html="cloudStepsHtml">
           <strong style="color: #fff;">🔑 Как получить персональный токен (1 минута):</strong>
           <ol>
             <li>Откройте страницу создания токена: <a href="https://github.com/settings/tokens?type=beta" target="_blank" style="text-decoration: underline; color: #60a5fa; font-weight: 700;">GitHub Fine-grained Tokens ↗</a></li>
@@ -1279,24 +1552,24 @@
 
         <div class="form-group">
           <label style="display: flex; justify-content: space-between;">
-            <span>Персональный токен GitHub (Fine-Grained Token):</span>
-            <span style="font-size: 11px; color: var(--accent); cursor: pointer;" onclick="toggleTokenVisibility()">Показать/Скрыть</span>
+            <span data-i18n="lblGithubToken">Персональный токен GitHub (Fine-Grained Token):</span>
+            <span style="font-size: 11px; color: var(--accent); cursor: pointer;" onclick="toggleTokenVisibility()" data-i18n="btnShowHide">Показать/Скрыть</span>
           </label>
-          <input type="password" class="form-control" id="cloudTokenInput" placeholder="github_pat_... или gho_...">
+          <input type="password" class="form-control" id="cloudTokenInput" placeholder="github_pat_... or gho_...">
         </div>
 
         <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px;">
           <input type="checkbox" id="cloudAutoSyncCheckbox" style="accent-color: var(--accent); cursor: pointer;" checked>
-          <label for="cloudAutoSyncCheckbox" style="font-size: 13px; color: #cbd5e1; cursor: pointer;">
+          <label for="cloudAutoSyncCheckbox" style="font-size: 13px; color: #cbd5e1; cursor: pointer;" data-i18n="lblAutoSync">
             Автоматически отправлять в облако при добавлении тренировок и смене ракеток
           </label>
         </div>
       </div>
       <div class="modal-footer" style="justify-content: space-between;">
-        <button class="btn btn-secondary" onclick="disconnectCloud()" style="color: #f87171;">Отключить</button>
+        <button class="btn btn-secondary" onclick="disconnectCloud()" style="color: #f87171;" data-i18n="btnDisconnect">Отключить</button>
         <div style="display: flex; gap: 8px;">
-          <button class="btn btn-secondary" onclick="syncFromCloudManual()">📥 Загрузить из облака</button>
-          <button class="btn btn-primary" onclick="saveCloudConfigAndSync()">☁️ Сохранить и синхронизировать</button>
+          <button class="btn btn-secondary" onclick="syncFromCloudManual()" data-i18n="btnPullCloud">📥 Загрузить из облака</button>
+          <button class="btn btn-primary" onclick="saveCloudConfigAndSync()" data-i18n="btnSaveSync">☁️ Сохранить и синхронизировать</button>
         </div>
       </div>
     </div>
@@ -1307,40 +1580,40 @@
     <div class="modal-card">
       <div class="modal-header">
         <div class="modal-title">
-          <span>🎾</span> Управление ракетками
+          <span>🎾</span> <span data-i18n="rktModalTitle">Управление ракетками</span>
         </div>
         <button class="modal-close" onclick="closeRacketModal()">&times;</button>
       </div>
       <div class="modal-body">
-        <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
+        <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;" data-i18n="rktModalSub">
           Добавляйте ваши ракетки, указывайте натяжку и струны. Каждой ракетке можно задать цвет для визуализации на графиках.
         </div>
         
         <div id="racketsListContainer"></div>
 
         <div class="racket-form">
-          <div style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 10px;">
+          <div style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 10px;" data-i18n="rktAddTitle">
             ➕ Добавить новую ракетку
           </div>
           <div class="form-group">
-            <label>Название модели:</label>
-            <input type="text" class="form-control" id="newRacketName" placeholder="например, Wilson Blade 98 v8">
+            <label data-i18n="rktNameLbl">Название модели:</label>
+            <input type="text" class="form-control" id="newRacketName" data-i18n-placeholder="rktNamePh" placeholder="например, Wilson Blade 98 v8">
           </div>
           <div class="form-group">
-            <label>Спецификации (вес, струны, натяжка):</label>
-            <input type="text" class="form-control" id="newRacketSpecs" placeholder="например, 305г, 16x19, Luxilon ALU Power 24kg">
+            <label data-i18n="rktSpecsLbl">Спецификации (вес, струны, натяжка):</label>
+            <input type="text" class="form-control" id="newRacketSpecs" data-i18n-placeholder="rktSpecsPh" placeholder="например, 305г, 16x19, Luxilon ALU Power 24kg">
           </div>
           <div class="form-group">
-            <label>Цвет маркера:</label>
+            <label data-i18n="rktColorLbl">Цвет маркера:</label>
             <div class="color-swatches" id="racketColorSwatches"></div>
           </div>
-          <button class="btn btn-primary" onclick="handleAddNewRacket()" style="margin-top: 8px;">
+          <button class="btn btn-primary" onclick="handleAddNewRacket()" style="margin-top: 8px;" data-i18n="btnAddRacket">
             Добавить в коллекцию
           </button>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="closeRacketModal()">Закрыть</button>
+        <button class="btn btn-secondary" onclick="closeRacketModal()" data-i18n="btnClose">Закрыть</button>
       </div>
     </div>
   </div>
@@ -1350,32 +1623,564 @@
     <div class="modal-card" style="max-width: 600px;">
       <div class="modal-header">
         <div class="modal-title">
-          <span>🏷️</span> Привязка ракеток к новым тренировкам
+          <span>🏷️</span> <span data-i18n="uploadModalTitle">Привязка ракеток к новым тренировкам</span>
         </div>
         <button class="modal-close" onclick="closeUploadAssignModal()">&times;</button>
       </div>
       <div class="modal-body">
-        <div style="font-size: 13px; color: #cbd5e1; margin-bottom: 14px;">
+        <div style="font-size: 13px; color: #cbd5e1; margin-bottom: 14px;" data-i18n="uploadModalSub">
           В загруженных файлах обнаружены маркеры этапов (Mark). Выберите, какой ракеткой выполнялись удары:
         </div>
         
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px; background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 8px;">
-          <span style="font-size: 12px; color: var(--text-muted);">Быстро назначить все на:</span>
+          <span style="font-size: 12px; color: var(--text-muted);" data-i18n="lblQuickAssign">Быстро назначить все на:</span>
           <select id="quickAssignAllSelect" style="flex: 1;"></select>
-          <button class="btn btn-secondary" onclick="applyQuickAssignAll()">Применить ко всем</button>
+          <button class="btn btn-secondary" onclick="applyQuickAssignAll()" data-i18n="btnApplyAll">Применить ко всем</button>
         </div>
 
         <div id="uploadAssignContainer" style="display: flex; flex-direction: column; gap: 10px;"></div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="closeUploadAssignModal()">Пропустить</button>
-        <button class="btn btn-primary" onclick="saveUploadAssignments()">✓ Сохранить и открыть</button>
+        <button class="btn btn-secondary" onclick="closeUploadAssignModal()" data-i18n="btnSkip">Пропустить</button>
+        <button class="btn btn-primary" onclick="saveUploadAssignments()" data-i18n="btnSaveOpen">✓ Сохранить и открыть</button>
       </div>
     </div>
   </div>
 
   <script>
-    // Physics Plow-Through factors per shot category
+    // ================= INTERNATIONALIZATION (RU / EN) =================
+    const I18N = {
+      ru: {
+        pageTitle: 'Tennis Swing Analyser — Аналитика ударов, спина и ракеток',
+        headerSubtitle: 'Анализ тренировок, спина, углов удара, сравнение ракеток и облако',
+        physicsLabel: 'Физика соударения:',
+        cloudBtnTitle: 'Настройка облачной синхронизации с GitHub',
+        btnMyRackets: '🎾 Мои ракетки',
+        btnAddXlsx: '📂 Добавить .xlsx',
+        btnBackupTitle: 'Сохранить резервную копию всех тренировок и ракеток',
+        btnBackup: '💾 Бэкап',
+        btnRestoreTitle: 'Восстановить из файла резервной копии .json',
+        btnRestore: '📥 Восстановить',
+        btnDemo: 'Denis (2 дня)',
+        btnClear: 'Очистить',
+        dropZoneTitle: 'Перетащите сюда новые файлы тренировок из Tennis Swing Analyser (.xlsx)',
+        dropZoneSub: 'Поддерживается одновременная загрузка нескольких тренировок с автосохранением в облако GitHub.',
+        tabSingle: 'Обзор тренировки',
+        tabSpin: 'Спин и угол удара',
+        tabCompare: 'Сравнение 2-х сессий',
+        tabRackets: 'Сравнение ракеток',
+        tabDynamics: 'Динамика по дням',
+        lblSession: 'Сессия:',
+        lblRacket: 'Ракетка:',
+        lblShots: 'Удары:',
+        lblSessionA: 'Сессия А (Базовая):',
+        lblSessionB: 'Сессия Б (Новая):',
+        lblSample: 'Выборка:',
+        optAllRackets: 'Все ракетки',
+        optAllSessions: 'Все загруженные тренировки',
+        optAllShots: 'Все типы ударов',
+        optFhTopspin: 'Форхенд топспин',
+        optFhFlat: 'Форхенд плоский',
+        optBhTopspin: 'Бэкхенд топспин',
+        optBhFlat: 'Бэкхенд плоский',
+        optServe: 'Подача / Смэш',
+        optSlice: 'Слайсы / Резаные',
+        optVolley: 'Удар с лета / Блок',
+        unitKph: 'км/ч',
+        unitMs: 'мс',
+        unitShots: 'уд.',
+        unitShotsPerDay: 'уд/день',
+        kpiTotalShots: 'Всего ударов',
+        kpiAvgSwing: 'Средняя скорость маха',
+        kpiMaxSwing: 'Макс. зафиксированная скорость',
+        kpiServe: 'Подача (Serve / Smash)',
+        kpiBalance: 'Баланс ударов',
+        kpiTimePrefix: 'Время: ',
+        kpiSessionPrefix: 'Сессия: ',
+        kpiOnlyRacket: 'только ',
+        kpiBallEstPrefix: '⚡ Мяч: ~',
+        kpiPeakSwingPrefix: 'Пик мах: ',
+        kpiServesCount: 'подач',
+        kpiNoServes: 'Подач не зафиксировано',
+        kpiFhDom: 'Форхенд',
+        kpiBhDom: 'Бэкхенд',
+        kpiOfWord: 'из',
+        chartTimelineTitle: '📈 Хронология ударов и этапы (Mark)',
+        chartTimelineSub: 'Скорость маха каждого удара во времени + привязка к используемой ракетке',
+        chartDonutTitle: '🎯 Распределение арсенала ударов',
+        chartDonutSub: 'Соотношение Flat / Topspin / Slice / Serve',
+        marksTitle: '🏷️ Анализ этапов и привязка ракеток (Mark Breakdown)',
+        marksSub: 'Каждая смена Mark фиксирует этап тренировки. Назначьте ракетку для каждого этапа — выбор сохранится в программе и облаке.',
+        shotTableTitle: '📋 Сводная таблица по типам ударов',
+        shotTableSub: 'Кликните на заголовок колонки для сортировки',
+        colShotType: 'Тип удара',
+        colCount: 'Кол-во',
+        colShare: 'Доля арсенала',
+        colAvgSwing: 'Ср. мах',
+        colAvgBall: 'Ср. мяч',
+        colMaxSwing: 'Пик мах',
+        colAvgAngle: 'Ср. угол (°)',
+        colAngleType: 'Траектория',
+        colAvgWristRot: 'Вращение кисти (rpm)',
+        colWristRot: 'Кисть (rpm)',
+        colWristElev: 'Подъем кисти (rpm)',
+        colArmRot: 'Вращение руки (rpm)',
+        colEstSpin: 'Спин (~rpm)',
+        colVariance: 'Разброс (Var)',
+        colAvgDuration: 'Ср. замах',
+        // Spin & Angle view
+        spinVerdictTitle: 'Биомеханика спина и траектории замаха (Spin & Angle Insights)',
+        kpiSpinAvgAngle: 'Ср. угол атаки / замаха',
+        kpiSpinFhGap: 'Угол FH Topspin vs Flat',
+        kpiSpinWristRot: 'Ср. вращение кисти',
+        kpiSpinEstRpm: 'Оценка спина мяча',
+        kpiSpinElevArm: 'Подъем кисти / Разброс',
+        spinScatterTitle: '🎯 Карта ударов: Скорость vs Угол атаки (°)',
+        spinScatterSub: 'Разделение ударов по траектории: Слайс (<-10°), Плоский (-10°..+15°), Топспин (>+15°)',
+        spinMechTitle: '📐 Механика по типам ударов',
+        spinMechSub: 'Угол замаха (°), вращение кисти и подъем для каждого удара',
+        pillAngle: 'Угол (°)',
+        pillWristRot: 'Кисть (rpm)',
+        pillWristElev: 'Подъем (rpm)',
+        pillEstSpin: 'Спин (~rpm)',
+        spinHistTitle: '📊 Распределение углов удара (°)',
+        spinHistSub: 'Частота ударов в каждом диапазоне угла траектории замаха',
+        spinRacketTitle: '🎾 Спин и угол атаки по ракеткам',
+        spinRacketSub: 'Сравнение угла замаха (°) и оценки вращения (~rpm) для каждой ракетки',
+        spinTableTitle: '🔬 Детальная таблица спина, вращения и углов удара',
+        spinTableSub: 'Кликните по колонке для сортировки • Включены компоненты сенсора (Кисть, Подъем, Рука)',
+        trajUp: 'Снизу-вверх (Топспин)',
+        trajFlat: 'Плоский удар (Drive)',
+        trajDown: 'Сверху-вниз (Слайс / Пронация)',
+        // Compare view
+        cmpVerdictTitle: 'Автоматический вердикт и анализ прогресса',
+        cmpChart1Title: '📊 Сравнение по типам ударов (Сессия А vs Б)',
+        cmpChart1Sub: 'Выберите метрику для сравнения по всем видам ударов',
+        cmpChart2Title: '🌀 Сравнение угла атаки и спина (А vs Б)',
+        cmpChart2Sub: 'Изменение угла замаха (°) и оценки спина (~rpm) по типам ударов',
+        cmpTableTitle: '⚖️ Детальная сравнительная таблица «Бок о бок»',
+        cmpTableSub: 'Сравнение объемов, скорости маха, угла атаки, вращения кисти и стабильности',
+        colParamShot: 'Параметр / Тип удара',
+        colDelta: 'Дельта (Δ Изменение)',
+        colDynamics: 'Динамика',
+        metricSwingSpeed: 'Скорость маха (kph)',
+        metricSwingAngle: 'Угол удара (°)',
+        metricEstSpin: 'Оценка спина (~rpm)',
+        metricWristRot: 'Вращение кисти (rpm)',
+        metricWristElev: 'Подъем кисти (rpm)',
+        metricVariance: 'Разброс (Variance)',
+        // Rackets view
+        rktVerdictTitle: 'Автоматический бенчмарк и вердикт по ракеткам',
+        rktSpeedChartTitle: '📊 Сравнение ракеток по типам ударов',
+        rktSpeedChartSub: 'Выберите метрику: скорость, угол замаха, спин или контроль',
+        rktProfileTitle: '🕸️ Профиль и характер ракеток (Радарный тест)',
+        rktProfileSub: 'Сравнение Мощи, Вращения, Подачи, Контроля и Угла атаки',
+        rktTableTitle: '📋 Сводная матрица сравнения ракеток',
+        rktTableSub: 'Все физические и технические метрики по каждой модели ракетки',
+        colRacket: 'Ракетка',
+        colSpecs: 'Спецификации',
+        colTotalShots: 'Всего ударов',
+        colAvgServe: 'Подача',
+        colFhTopspin: 'FH Топспин',
+        // Dynamics view
+        dynSelectDays: '📅 Выберите тренировочные дни для анализа динамики:',
+        btnSelectAll: 'Выбрать все',
+        btnReset: 'Сбросить',
+        kpiDynDays: 'Дней в выборке',
+        kpiDynSwingDelta: 'Динамика скорости маха',
+        kpiDynServeDelta: 'Динамика подачи',
+        kpiDynRecord: 'Рекордная скорость периода',
+        dynChartSpeedTitle: '📈 Прогресс скорости маха и мяча во времени',
+        dynChartSpeedSub: 'Динамика по тренировочным дням',
+        dynChartServeTitle: '⚡ Прогресс подачи и вращения кисти',
+        dynChartServeSub: 'Скорость подачи и вращение кисти на топспинах (rpm)',
+        dynChartAngleTitle: '🌀 Динамика угла атаки (°) и стабильности (Variance) по дням',
+        dynChartAngleSub: 'Средний угол удара, угол FH Топспина (°) и стабильность замаха (ниже = стабильнее)',
+        dynTableTitle: '📜 Хронологическая таблица тренировок и изменений',
+        dynTableSub: 'Сравнение показателей каждого дня с предыдущим днем (Δ)',
+        colDate: 'Дата',
+        colTraining: 'Тренировка',
+        colShots: 'Ударов',
+        colUsedRackets: 'Использованные ракетки',
+        colDeltaPrev: 'Динамика (Δ)',
+        // Modals
+        cloudModalTitle: 'Облачная синхронизация с GitHub',
+        cloudModalDesc: 'Автоматически сохраняет все ваши тренировки, историю и ракетки в репозиторий <b style="color: #fff;">DeoNd11/tennis-analyzer</b> в файл <code style="color: var(--accent);">tennis_cloud_database.json</code>. Больше не нужно вручную скачивать и загружать файлы бэкапа!',
+        cloudStatusLabel: 'Статус подключения:',
+        btnTestConn: 'Проверить связь',
+        cloudStepsHtml: '<strong style="color: #fff;">🔑 Как получить персональный токен (1 минута):</strong><ol><li>Откройте страницу создания токена: <a href="https://github.com/settings/tokens?type=beta" target="_blank" style="text-decoration: underline; color: #60a5fa; font-weight: 700;">GitHub Fine-grained Tokens ↗</a></li><li>Нажмите <b>«Generate new token»</b>.</li><li>В поле <b>Token name</b> напишите: <code>Tennis Analyzer Cloud</code>.</li><li>В блоке <b>Repository access</b> выберите: <b>«Only select repositories»</b> &rarr; выберите <code>tennis-analyzer</code>.</li><li>В блоке <b>Repository permissions</b> найдите строку <b>Contents</b> и переключите на <b>«Access: Read and write»</b>.</li><li>Нажмите зелёную кнопку <b>Generate token</b> внизу, скопируйте токен (начинается с <code>github_pat_</code>) и вставьте в поле ниже:</li></ol>',
+        lblGithubToken: 'Персональный токен GitHub (Fine-Grained Token):',
+        btnShowHide: 'Показать/Скрыть',
+        lblAutoSync: 'Автоматически отправлять в облако при добавлении тренировок и смене ракеток',
+        btnDisconnect: 'Отключить',
+        btnPullCloud: '📥 Загрузить из облака',
+        btnSaveSync: '☁️ Сохранить и синхронизировать',
+        rktModalTitle: 'Управление ракетками',
+        rktModalSub: 'Добавляйте ваши ракетки, указывайте натяжку и струны. Каждой ракетке можно задать цвет для визуализации на графиках.',
+        rktAddTitle: '➕ Добавить новую ракетку',
+        rktNameLbl: 'Название модели:',
+        rktNamePh: 'например, Wilson Blade 98 v8',
+        rktSpecsLbl: 'Спецификации (вес, струны, натяжка):',
+        rktSpecsPh: 'например, 305г, 16x19, Luxilon ALU Power 24kg',
+        rktColorLbl: 'Цвет маркера:',
+        btnAddRacket: 'Добавить в коллекцию',
+        btnClose: 'Закрыть',
+        uploadModalTitle: 'Привязка ракеток к новым тренировкам',
+        uploadModalSub: 'В загруженных файлах обнаружены маркеры этапов (Mark). Выберите, какой ракеткой выполнялись удары:',
+        lblQuickAssign: 'Быстро назначить все на:',
+        btnApplyAll: 'Применить ко всем',
+        btnSkip: 'Пропустить',
+        btnSaveOpen: '✓ Сохранить и открыть',
+        // Dynamic JS strings
+        cloudSyncing: 'Синхронизация...',
+        cloudActive: 'Облако активно',
+        cloudConnect: 'Подключить облако',
+        cloudConnectedHtml: '<span style="color: var(--accent);">🟢 Подключено</span> &bull; Репозиторий: ',
+        cloudOfflineHtml: '<span style="color: #94a3b8;">⚪ Не подключено (работает локально)</span>',
+        lastSyncPrefix: 'Последняя синхронизация: ',
+        noSessionsOpt: '(Нет сессий)',
+        usedRacketLbl: 'Используемая ракетка:',
+        racketNotSelected: '— Ракетка не выбрана —',
+        shotsWord: 'ударов',
+        avgSwingLbl: 'Ср. скорость маха:',
+        estBallLbl: 'Расчетный мяч:',
+        peakSpeedLbl: 'Пиковая скорость:',
+        avgWristRotLbl: 'Ср. вращение кисти:',
+        avgAngleLbl: 'Ср. угол атаки:',
+        estSpinLbl: 'Спин (~rpm):',
+        notAssigned: 'Не назначена',
+        growth: '▲ Рост',
+        decline: '▼ Снижение',
+        unchanged: 'Без изменений',
+        powerGain: 'Прирост силы',
+        speedDrop: 'Снижение скорости',
+        missingOneSess: 'Не выполнялся в одной из сессий',
+        baseDay: 'Базовый день',
+        noRacketData: 'Нет данных по ракеткам. Назначьте ракетки этапам тренировок в Обзоре сессии.',
+        noShotsSelected: 'Нет ударов для выбранных фильтров.',
+        radarLabels: ['Мощь маха', 'Спин (~RPM)', 'Подача', 'Контроль', 'Угол атаки (°)'],
+        confirmClear: 'Вы уверены, что хотите полностью очистить все загруженные тренировки?',
+        confirmDisconnect: 'Отключить облачную синхронизацию на этом устройстве? Данные останутся в браузере и на GitHub.',
+        confirmDelRacket: 'Удалить эту ракетку? Привязанные к ней этапы потеряют связь.',
+        minOneRacket: 'В системе должна оставаться хотя бы одна ракетка.',
+        enterRacketName: 'Пожалуйста, введите название ракетки.',
+        enterToken: 'Пожалуйста, введите Personal Access Token от GitHub.',
+        enterTokenFirst: 'Сначала введите токен GitHub.',
+        toastSavedCloud: 'Тренировки сохранены в облако GitHub!',
+        toastCheckingToken: 'Проверяем токен и синхронизируем...',
+        toastDisconnected: 'Облачная синхронизация отключена',
+        toastSyncErr: 'Ошибка синхронизации',
+        toastLoadedCloud: 'Загружено из облака: {s} тренировок, {r} ракеток',
+        pullFailed: 'Не удалось загрузить данные из облака или файл tennis_cloud_database.json еще не создан.',
+        backupRestored: 'Резервная копия успешно восстановлена!',
+        backupErr: 'Ошибка чтения файла резервной копии: ',
+        deleteBtn: 'Удалить',
+        specsMissing: 'Спецификации не указаны',
+        shotsInDb: 'ударов в базе',
+        sessionTotalRow: 'Всего ударов за тренировку',
+        sessionAvgSwingRow: 'Средняя скорость маха',
+        sessionAvgBallRow: 'Расчетная скорость мяча',
+        sessionMaxSwingRow: 'Максимальная скорость маха',
+        sessionServeAvgRow: 'Средняя скорость подачи',
+        sessionAvgAngleRow: 'Средний угол удара / атаки',
+        sessionFhTopAngleRow: 'Угол FH Топспин',
+        sessionEstSpinRow: 'Средняя оценка спина',
+        sessionWristRotRow: 'Среднее вращение кисти',
+        sessionWristElevRow: 'Вертикальный подъем кисти',
+        sessionVarianceRow: 'Стабильность (Variance, ниже лучше)'
+      },
+      en: {
+        pageTitle: 'Tennis Swing Analyser — Stroke, Spin, Angle & Racket Analytics',
+        headerSubtitle: 'Session analytics, spin & impact angles, racket benchmarks & cloud sync',
+        physicsLabel: 'Impact Physics:',
+        cloudBtnTitle: 'Configure GitHub Cloud Sync',
+        btnMyRackets: '🎾 My Rackets',
+        btnAddXlsx: '📂 Add .xlsx',
+        btnBackupTitle: 'Export JSON backup of all sessions and rackets',
+        btnBackup: '💾 Backup',
+        btnRestoreTitle: 'Restore from a .json backup file',
+        btnRestore: '📥 Restore',
+        btnDemo: 'Denis (2 days)',
+        btnClear: 'Clear',
+        dropZoneTitle: 'Drop Tennis Swing Analyser training files here (.xlsx / .csv)',
+        dropZoneSub: 'Multi-file upload supported with automatic GitHub cloud sync.',
+        tabSingle: 'Session Overview',
+        tabSpin: 'Spin & Impact Angle',
+        tabCompare: 'Compare 2 Sessions',
+        tabRackets: 'Compare Rackets',
+        tabDynamics: 'Multi-Day Dynamics',
+        lblSession: 'Session:',
+        lblRacket: 'Racket:',
+        lblShots: 'Shots:',
+        lblSessionA: 'Session A (Base):',
+        lblSessionB: 'Session B (New):',
+        lblSample: 'Scope:',
+        optAllRackets: 'All rackets',
+        optAllSessions: 'All loaded sessions',
+        optAllShots: 'All shot types',
+        optFhTopspin: 'Forehand topspin',
+        optFhFlat: 'Forehand flat',
+        optBhTopspin: 'Backhand topspin',
+        optBhFlat: 'Backhand flat',
+        optServe: 'Serve / Smash',
+        optSlice: 'Slice',
+        optVolley: 'Volley / Block',
+        unitKph: 'kph',
+        unitMs: 'ms',
+        unitShots: 'shots',
+        unitShotsPerDay: 'shots/day',
+        kpiTotalShots: 'Total Shots',
+        kpiAvgSwing: 'Avg Swing Speed',
+        kpiMaxSwing: 'Max Recorded Speed',
+        kpiServe: 'Serve / Smash',
+        kpiBalance: 'Stroke Balance',
+        kpiTimePrefix: 'Time: ',
+        kpiSessionPrefix: 'Session: ',
+        kpiOnlyRacket: 'only ',
+        kpiBallEstPrefix: '⚡ Ball: ~',
+        kpiPeakSwingPrefix: 'Peak swing: ',
+        kpiServesCount: 'serves',
+        kpiNoServes: 'No serves recorded',
+        kpiFhDom: 'Forehand',
+        kpiBhDom: 'Backhand',
+        kpiOfWord: 'of',
+        chartTimelineTitle: '📈 Shot Timeline & Stages (Mark)',
+        chartTimelineSub: 'Swing speed over time with color-coded racket assignment',
+        chartDonutTitle: '🎯 Shot Arsenal Distribution',
+        chartDonutSub: 'Flat / Topspin / Slice / Serve breakdown',
+        marksTitle: '🏷️ Mark Stage Breakdown & Racket Assignment',
+        marksSub: 'Each Mark separates a practice segment. Assign the racket used — saved automatically to cloud.',
+        shotTableTitle: '📋 Shot Types Summary Table',
+        shotTableSub: 'Click any column header to sort',
+        colShotType: 'Shot Type',
+        colCount: 'Count',
+        colShare: 'Share',
+        colAvgSwing: 'Avg Swing',
+        colAvgBall: 'Avg Ball',
+        colMaxSwing: 'Peak Swing',
+        colAvgAngle: 'Avg Angle (°)',
+        colAngleType: 'Trajectory',
+        colAvgWristRot: 'Wrist Rot (rpm)',
+        colWristRot: 'Wrist (rpm)',
+        colWristElev: 'Wrist Elev (rpm)',
+        colArmRot: 'Arm Rot (rpm)',
+        colEstSpin: 'Est. Spin (~rpm)',
+        colVariance: 'Variance',
+        colAvgDuration: 'Avg Duration',
+        // Spin & Angle view
+        spinVerdictTitle: 'Spin Biomechanics & Swing Path Insights',
+        kpiSpinAvgAngle: 'Avg Swing / Attack Angle',
+        kpiSpinFhGap: 'FH Topspin vs Flat Angle',
+        kpiSpinWristRot: 'Avg Wrist Rotation',
+        kpiSpinEstRpm: 'Est. Ball Spin',
+        kpiSpinElevArm: 'Wrist Lift / Consistency',
+        spinScatterTitle: '🎯 Shot Map: Swing Speed vs Impact Angle (°)',
+        spinScatterSub: 'Trajectory separation: Slice (<-10°), Flat Drive (-10°..+15°), Topspin (>+15°)',
+        spinMechTitle: '📐 Mechanics by Shot Type',
+        spinMechSub: 'Swing angle (°), wrist rotation & elevation for each shot type',
+        pillAngle: 'Angle (°)',
+        pillWristRot: 'Wrist (rpm)',
+        pillWristElev: 'Lift (rpm)',
+        pillEstSpin: 'Spin (~rpm)',
+        spinHistTitle: '📊 Swing Angle Distribution (°)',
+        spinHistSub: 'Shot frequency across attack angle zones',
+        spinRacketTitle: '🎾 Spin & Attack Angle by Racket',
+        spinRacketSub: 'Compare avg swing angle (°) and estimated spin (~rpm) across rackets',
+        spinTableTitle: '🔬 Detailed Spin, Rotation & Swing Angle Matrix',
+        spinTableSub: 'Click column header to sort • Includes raw sensor components (Wrist, Lift, Arm)',
+        trajUp: 'Low-to-High (Topspin)',
+        trajFlat: 'Horizontal (Flat Drive)',
+        trajDown: 'High-to-Low (Slice / Pronation)',
+        // Compare view
+        cmpVerdictTitle: 'Automated Progress Verdict & Insights',
+        cmpChart1Title: '📊 Metric Comparison by Shot Type (Session A vs B)',
+        cmpChart1Sub: 'Select metric to compare side-by-side across all shot types',
+        cmpChart2Title: '🌀 Swing Angle & Spin Comparison (A vs B)',
+        cmpChart2Sub: 'Impact angle (°) and estimated ball spin (~rpm) comparison',
+        cmpTableTitle: '⚖️ Side-by-Side Detailed Comparison Table',
+        cmpTableSub: 'Volume, swing speed, attack angle, wrist spin & consistency comparison',
+        colParamShot: 'Metric / Shot Type',
+        colDelta: 'Delta (Δ Change)',
+        colDynamics: 'Trend',
+        metricSwingSpeed: 'Swing Speed (kph)',
+        metricSwingAngle: 'Swing Angle (°)',
+        metricEstSpin: 'Est. Ball Spin (~rpm)',
+        metricWristRot: 'Wrist Rotation (rpm)',
+        metricWristElev: 'Wrist Elevation (rpm)',
+        metricVariance: 'Variance (Consistency)',
+        // Rackets view
+        rktVerdictTitle: 'Automated Racket Benchmark & Verdict',
+        rktSpeedChartTitle: '📊 Racket Comparison by Shot Type',
+        rktSpeedChartSub: 'Choose metric: speed, swing angle, spin, or variance',
+        rktProfileTitle: '🕸️ Racket Profile Radar',
+        rktProfileSub: 'Power, Spin, Serve, Control & Attack Angle profile',
+        rktTableTitle: '📋 Racket Comparison Matrix',
+        rktTableSub: 'All physical and biomechanical metrics per racket model',
+        colRacket: 'Racket',
+        colSpecs: 'Specs',
+        colTotalShots: 'Total Shots',
+        colAvgServe: 'Serve',
+        colFhTopspin: 'FH Topspin',
+        // Dynamics view
+        dynSelectDays: '📅 Select training days for multi-day analysis:',
+        btnSelectAll: 'Select All',
+        btnReset: 'Reset',
+        kpiDynDays: 'Days Selected',
+        kpiDynSwingDelta: 'Swing Speed Trend',
+        kpiDynServeDelta: 'Serve Speed Trend',
+        kpiDynRecord: 'Period Record Speed',
+        dynChartSpeedTitle: '📈 Swing & Ball Speed Progression',
+        dynChartSpeedSub: 'Trend across selected training days',
+        dynChartServeTitle: '⚡ Serve Speed & Topspin Wrist Rotation',
+        dynChartServeSub: 'Serve velocity and topspin wrist whip (rpm)',
+        dynChartAngleTitle: '🌀 Multi-Day Swing Angle (°) & Consistency (Variance)',
+        dynChartAngleSub: 'Average swing angle, FH Topspin angle (°) & swing variance (lower = more consistent)',
+        dynTableTitle: '📜 Chronological Training Log & Deltas',
+        dynTableSub: 'Day-over-day comparison (Δ)',
+        colDate: 'Date',
+        colTraining: 'Session',
+        colShots: 'Shots',
+        colUsedRackets: 'Rackets Used',
+        colDeltaPrev: 'Change (Δ)',
+        // Modals
+        cloudModalTitle: 'GitHub Cloud Sync',
+        cloudModalDesc: 'Automatically saves all training sessions, history & rackets to <b style="color: #fff;">DeoNd11/tennis-analyzer</b> in <code style="color: var(--accent);">tennis_cloud_database.json</code>. No more manual JSON backups!',
+        cloudStatusLabel: 'Connection Status:',
+        btnTestConn: 'Test Connection',
+        cloudStepsHtml: '<strong style="color: #fff;">🔑 How to get a Personal Access Token (1 min):</strong><ol><li>Open token settings: <a href="https://github.com/settings/tokens?type=beta" target="_blank" style="text-decoration: underline; color: #60a5fa; font-weight: 700;">GitHub Fine-grained Tokens ↗</a></li><li>Click <b>"Generate new token"</b>.</li><li>Set <b>Token name</b> to: <code>Tennis Analyzer Cloud</code>.</li><li>Under <b>Repository access</b> select: <b>"Only select repositories"</b> &rarr; pick <code>tennis-analyzer</code>.</li><li>Under <b>Repository permissions</b> find <b>Contents</b> and set <b>"Access: Read and write"</b>.</li><li>Click <b>Generate token</b>, copy the token (starts with <code>github_pat_</code>) and paste below:</li></ol>',
+        lblGithubToken: 'GitHub Personal Access Token (Fine-Grained):',
+        btnShowHide: 'Show / Hide',
+        lblAutoSync: 'Automatically push to cloud when adding sessions or changing rackets',
+        btnDisconnect: 'Disconnect',
+        btnPullCloud: '📥 Pull from Cloud',
+        btnSaveSync: '☁️ Save & Sync',
+        rktModalTitle: 'Manage Rackets',
+        rktModalSub: 'Add your rackets with weight, strings, and tension. Each racket gets a color for charts.',
+        rktAddTitle: '➕ Add New Racket',
+        rktNameLbl: 'Model Name:',
+        rktNamePh: 'e.g., Wilson Blade 98 v8',
+        rktSpecsLbl: 'Specs (weight, strings, tension):',
+        rktSpecsPh: 'e.g., 305g, 16x19, Luxilon ALU Power 24kg',
+        rktColorLbl: 'Badge Color:',
+        btnAddRacket: 'Add Racket',
+        btnClose: 'Close',
+        uploadModalTitle: 'Assign Rackets to New Sessions',
+        uploadModalSub: 'Stage markers (Mark) were detected in uploaded files. Select which racket you used:',
+        lblQuickAssign: 'Quick assign all to:',
+        btnApplyAll: 'Apply to All',
+        btnSkip: 'Skip',
+        btnSaveOpen: '✓ Save & Open',
+        // Dynamic JS strings
+        cloudSyncing: 'Syncing...',
+        cloudActive: 'Cloud Active',
+        cloudConnect: 'Connect Cloud',
+        cloudConnectedHtml: '<span style="color: var(--accent);">🟢 Connected</span> &bull; Repository: ',
+        cloudOfflineHtml: '<span style="color: #94a3b8;">⚪ Offline (Local only)</span>',
+        lastSyncPrefix: 'Last synced: ',
+        noSessionsOpt: '(No sessions)',
+        usedRacketLbl: 'Racket used:',
+        racketNotSelected: '— Not assigned —',
+        shotsWord: 'shots',
+        avgSwingLbl: 'Avg Swing Speed:',
+        estBallLbl: 'Est. Ball Speed:',
+        peakSpeedLbl: 'Peak Speed:',
+        avgWristRotLbl: 'Avg Wrist Rot:',
+        avgAngleLbl: 'Avg Attack Angle:',
+        estSpinLbl: 'Est. Spin (~rpm):',
+        notAssigned: 'Not assigned',
+        growth: '▲ Up',
+        decline: '▼ Down',
+        unchanged: 'No change',
+        powerGain: 'Speed gain',
+        speedDrop: 'Speed drop',
+        missingOneSess: 'Missing in one session',
+        baseDay: 'Baseline',
+        noRacketData: 'No racket data found. Assign rackets to Marks in Session Overview.',
+        noShotsSelected: 'No shots match the selected filters.',
+        radarLabels: ['Swing Power', 'Ball Spin', 'Serve', 'Consistency', 'Attack Angle (°)'],
+        confirmClear: 'Are you sure you want to clear all loaded training sessions?',
+        confirmDisconnect: 'Disconnect cloud sync on this device? Local & GitHub data remain safe.',
+        confirmDelRacket: 'Delete this racket? Assigned Marks will lose their link.',
+        minOneRacket: 'At least one racket must remain in the system.',
+        enterRacketName: 'Please enter a racket name.',
+        enterToken: 'Please enter a GitHub Personal Access Token.',
+        enterTokenFirst: 'Please enter your GitHub token first.',
+        toastSavedCloud: 'Sessions saved to GitHub Cloud!',
+        toastCheckingToken: 'Verifying token & syncing...',
+        toastDisconnected: 'Cloud sync disconnected',
+        toastSyncErr: 'Sync error',
+        toastLoadedCloud: 'Loaded from cloud: {s} sessions, {r} rackets',
+        pullFailed: 'Failed to load data from cloud or tennis_cloud_database.json does not exist yet.',
+        backupRestored: 'Backup restored successfully!',
+        backupErr: 'Error reading backup file: ',
+        deleteBtn: 'Delete',
+        specsMissing: 'No specs specified',
+        shotsInDb: 'shots in DB',
+        sessionTotalRow: 'Total Shots in Session',
+        sessionAvgSwingRow: 'Average Swing Speed',
+        sessionAvgBallRow: 'Estimated Ball Speed',
+        sessionMaxSwingRow: 'Peak Swing Speed',
+        sessionServeAvgRow: 'Average Serve Speed',
+        sessionAvgAngleRow: 'Average Attack / Swing Angle',
+        sessionFhTopAngleRow: 'FH Topspin Angle',
+        sessionEstSpinRow: 'Average Est. Ball Spin',
+        sessionWristRotRow: 'Average Wrist Rotation',
+        sessionWristElevRow: 'Average Wrist Elevation (Lift)',
+        sessionVarianceRow: 'Consistency (Variance, lower is better)'
+      }
+    };
+
+    let currentLang = localStorage.getItem('tennis_app_lang') || 'ru';
+
+    function t(key, params = {}) {
+      const dict = I18N[currentLang] || I18N.ru;
+      let str = dict[key] !== undefined ? dict[key] : (I18N.ru[key] !== undefined ? I18N.ru[key] : key);
+      if (typeof str === 'string' && params) {
+        Object.keys(params).forEach(k => {
+          str = str.replace('{' + k + '}', params[k]);
+        });
+      }
+      return str;
+    }
+
+    function setLanguage(lang) {
+      if (!I18N[lang]) return;
+      currentLang = lang;
+      localStorage.setItem('tennis_app_lang', lang);
+      applyLanguageToDOM();
+      populateSelects();
+      updateCloudStatusUI();
+      renderCurrentView();
+    }
+
+    function applyLanguageToDOM() {
+      document.documentElement.lang = currentLang;
+      document.title = t('pageTitle');
+
+      const btnRu = document.getElementById('langBtnRu');
+      const btnEn = document.getElementById('langBtnEn');
+      if (btnRu) btnRu.classList.toggle('active', currentLang === 'ru');
+      if (btnEn) btnEn.classList.toggle('active', currentLang === 'en');
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        el.textContent = t(key);
+      });
+      document.querySelectorAll('[data-i18n-html]').forEach(el => {
+        const key = el.getAttribute('data-i18n-html');
+        el.innerHTML = t(key);
+      });
+      document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        const key = el.getAttribute('data-i18n-title');
+        el.title = t(key);
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        el.placeholder = t(key);
+      });
+    }
+
+    // ================= PHYSICS & BIOMECHANICS HELPERS =================
     const PLOW_FACTORS = {
       'flat': 1.42,
       'topspin': 1.38,
@@ -1387,23 +2192,53 @@
     };
 
     function getPlowMultiplier(shotType, baseFactor = 1.40) {
-      let t = (shotType || '').toLowerCase();
+      let tp = (shotType || '').toLowerCase();
       let catMultiplier = PLOW_FACTORS.default;
-      if (t.includes('serve') || t.includes('smash')) catMultiplier = PLOW_FACTORS.serve;
-      else if (t.includes('flat')) catMultiplier = PLOW_FACTORS.flat;
-      else if (t.includes('topspin')) catMultiplier = PLOW_FACTORS.topspin;
-      else if (t.includes('slice')) catMultiplier = PLOW_FACTORS.slice;
-      else if (t.includes('volley') || t.includes('block')) catMultiplier = PLOW_FACTORS.volley;
+      if (tp.includes('serve') || tp.includes('smash')) catMultiplier = PLOW_FACTORS.serve;
+      else if (tp.includes('flat')) catMultiplier = PLOW_FACTORS.flat;
+      else if (tp.includes('topspin')) catMultiplier = PLOW_FACTORS.topspin;
+      else if (tp.includes('slice')) catMultiplier = PLOW_FACTORS.slice;
+      else if (tp.includes('volley') || tp.includes('block')) catMultiplier = PLOW_FACTORS.volley;
       let ratio = baseFactor / 1.40;
       return +(catMultiplier * ratio).toFixed(3);
     }
 
+    // Attack / Swing Path Angle (degrees): atan2(vertical wrist elevation, horizontal swing base)
+    function getSwingAngleDeg(shot) {
+      const horiz = Math.max(Math.abs(shot.armRot || 0), (shot.swingSpeed || 0) * 0.7, 1);
+      return +(Math.atan2(shot.wristElev || 0, horiz) * 180 / Math.PI).toFixed(1);
+    }
+
+    // Estimated Ball Spin Intensity (~RPM) combining wrist whip and vertical brush
+    function getEstBallSpin(shot) {
+      return Math.round(Math.abs(shot.wristRot || 0) * 30 + Math.abs(shot.wristElev || 0) * 18);
+    }
+
+    function getSwingTrajectoryInfo(angleDeg) {
+      if (angleDeg >= 15) return { label: t('trajUp'), cls: 'angle-up', arrow: '↗' };
+      if (angleDeg > -10) return { label: t('trajFlat'), cls: 'angle-flat', arrow: '→' };
+      return { label: t('trajDown'), cls: 'angle-down', arrow: '↘' };
+    }
+
+    function matchesShotFilter(shotType, filterKey) {
+      if (!filterKey || filterKey === 'all') return true;
+      const l = (shotType || '').toLowerCase();
+      if (filterKey === 'serve') return l.includes('serve') || l.includes('smash');
+      if (filterKey === 'fh_topspin') return l.includes('forehand topspin');
+      if (filterKey === 'fh_flat') return l.includes('forehand flat');
+      if (filterKey === 'bh_topspin') return l.includes('backhand topspin');
+      if (filterKey === 'bh_flat') return l.includes('backhand flat');
+      if (filterKey === 'slice') return l.includes('slice');
+      if (filterKey === 'volley') return l.includes('volley') || l.includes('block');
+      return true;
+    }
+
     // Default Rackets
     const DEFAULT_RACKETS = [
-      { id: 'racket_wilson', name: 'Wilson Pro Staff 97 v14', specs: '315г, 16x19, Luxilon ALU Power 24kg', color: '#ef4444' },
-      { id: 'racket_babolat', name: 'Babolat Pure Aero 2023', specs: '300г, 16x19, Babolat RPM Blast 24kg', color: '#eab308' },
-      { id: 'racket_head', name: 'Head Speed MP 2024', specs: '300г, 16x19, Head Lynx Tour 23kg', color: '#10b981' },
-      { id: 'racket_yonex', name: 'Yonex EZONE 98', specs: '305г, 16x19, Yonex Polytour Pro 24kg', color: '#3b82f6' }
+      { id: 'racket_wilson', name: 'Wilson Pro Staff 97 v14', specs: '315g, 16x19, Luxilon ALU Power 24kg', color: '#ef4444' },
+      { id: 'racket_babolat', name: 'Babolat Pure Aero 2023', specs: '300g, 16x19, Babolat RPM Blast 24kg', color: '#eab308' },
+      { id: 'racket_head', name: 'Head Speed MP 2024', specs: '300g, 16x19, Head Lynx Tour 23kg', color: '#10b981' },
+      { id: 'racket_yonex', name: 'Yonex EZONE 98', specs: '305g, 16x19, Yonex Polytour Pro 24kg', color: '#3b82f6' }
     ];
 
     const PRESET_COLORS = ['#ef4444', '#f59e0b', '#10b981', '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899', '#f97316'];
@@ -1429,6 +2264,10 @@
 
     // Filters
     let singleRacketFilterId = 'all';
+    let spinSessionFilterId = 'all';
+    let spinRacketFilterId = 'all';
+    let spinShotFilterType = 'all';
+    let spinMechMetric = 'angle';
     let racketsSessionFilterId = 'all';
     let dynamicsRacketFilterId = 'all';
     let dynamicsShotFilterType = 'all';
@@ -1437,15 +2276,23 @@
     // Charts instances
     let timelineChart = null;
     let donutChart = null;
+    let spinScatterChart = null;
+    let spinMechanicsChart = null;
+    let spinAngleHistChart = null;
+    let spinRacketChart = null;
     let compareBarChart = null;
+    let compareAngleSpinChart = null;
     let racketsSpeedChart = null;
     let racketsProfileChart = null;
     let dynamicsSpeedChart = null;
     let dynamicsServeSpinChart = null;
+    let dynamicsAngleVarChart = null;
 
-    // Sort state for Shot Type table
+    // Sort state for Shot Type & Spin tables
     let shotSortCol = 'count';
     let shotSortAsc = false;
+    let spinSortCol = 'count';
+    let spinSortAsc = false;
 
     let pendingUploadSessions = [];
     let selectedRacketColor = PRESET_COLORS[0];
@@ -1453,6 +2300,7 @@
     // Initialize
     window.addEventListener('DOMContentLoaded', () => {
       loadSavedState();
+      applyLanguageToDOM();
       initPhysicsControl();
       initEventListeners();
       initColorSwatches();
@@ -1510,6 +2358,21 @@
       document.getElementById('singleRacketFilter').addEventListener('change', (e) => {
         singleRacketFilterId = e.target.value;
         renderSingleView();
+      });
+
+      document.getElementById('spinSessionFilter').addEventListener('change', (e) => {
+        spinSessionFilterId = e.target.value;
+        renderSpinView();
+      });
+
+      document.getElementById('spinRacketFilter').addEventListener('change', (e) => {
+        spinRacketFilterId = e.target.value;
+        renderSpinView();
+      });
+
+      document.getElementById('spinShotFilter').addEventListener('change', (e) => {
+        spinShotFilterType = e.target.value;
+        renderSpinView();
       });
 
       document.getElementById('compareSessionA').addEventListener('change', (e) => {
@@ -1598,15 +2461,15 @@
       if (btn && text) {
         if (isSyncing) {
           btn.className = 'btn btn-cloud syncing';
-          text.textContent = 'Синхронизация...';
+          text.textContent = t('cloudSyncing');
           icon.textContent = '⏳';
         } else if (token) {
           btn.className = 'btn btn-cloud connected';
-          text.textContent = 'Облако активно';
+          text.textContent = t('cloudActive');
           icon.textContent = '☁️';
         } else {
           btn.className = 'btn btn-cloud';
-          text.textContent = 'Подключить облако';
+          text.textContent = t('cloudConnect');
           icon.textContent = '☁️';
         }
       }
@@ -1621,11 +2484,11 @@
 
       if (modalStatus) {
         if (token) {
-          modalStatus.innerHTML = '<span style="color: var(--accent);">🟢 Подключено</span> &bull; Репозиторий: ' + GITHUB_REPO_OWNER + '/' + GITHUB_REPO_NAME;
+          modalStatus.innerHTML = t('cloudConnectedHtml') + GITHUB_REPO_OWNER + '/' + GITHUB_REPO_NAME;
           let ls = localStorage.getItem('tennis_last_cloud_sync');
-          if (lastSync) lastSync.textContent = ls ? ('Последняя синхронизация: ' + ls) : '';
+          if (lastSync) lastSync.textContent = ls ? (t('lastSyncPrefix') + ls) : '';
         } else {
-          modalStatus.innerHTML = '<span style="color: #94a3b8;">⚪ Не подключено (работает локально)</span>';
+          modalStatus.innerHTML = t('cloudOfflineHtml');
           if (lastSync) lastSync.textContent = '';
         }
       }
@@ -1653,7 +2516,7 @@
       const token = inp.value.trim();
 
       if (!token) {
-        alert('Пожалуйста, введите Personal Access Token от GitHub.');
+        alert(t('enterToken'));
         return;
       }
 
@@ -1663,7 +2526,7 @@
       localStorage.setItem('tennis_github_autosync', autoSyncEnabled.toString());
 
       updateCloudStatusUI();
-      showCloudToast('Проверяем токен и синхронизируем...', true, '⏳');
+      showCloudToast(t('toastCheckingToken'), true, '⏳');
 
       const success = await pushToGitHubCloud(true);
       if (success) {
@@ -1672,18 +2535,18 @@
     }
 
     function disconnectCloud() {
-      if (confirm('Отключить облачную синхронизацию на этом устройстве? Данные останутся в браузере и на GitHub.')) {
+      if (confirm(t('confirmDisconnect'))) {
         githubToken = '';
         localStorage.removeItem('tennis_github_token');
         updateCloudStatusUI();
-        showCloudToast('Облачная синхронизация отключена', false, '⚪');
+        showCloudToast(t('toastDisconnected'), false, '⚪');
       }
     }
 
     async function testCloudConnection() {
       const token = (document.getElementById('cloudTokenInput') ? document.getElementById('cloudTokenInput').value.trim() : '') || getGitHubToken();
       if (!token) {
-        alert('Сначала введите токен GitHub.');
+        alert(t('enterTokenFirst'));
         return;
       }
       try {
@@ -1696,13 +2559,13 @@
         });
         if (res.ok) {
           const data = await res.json();
-          alert('Связь установлена успешно! Доступ к репозиторию ' + data.full_name + ' подтвержден.');
+          alert((currentLang === 'en' ? 'Connection successful! Repository access confirmed: ' : 'Связь установлена успешно! Доступ к репозиторию подтвержден: ') + data.full_name);
         } else {
           const err = await res.json();
-          alert('Ошибка авторизации (' + res.status + '): ' + (err.message || 'Проверьте токен'));
+          alert((currentLang === 'en' ? 'Auth error (' : 'Ошибка авторизации (') + res.status + '): ' + (err.message || 'Check token'));
         }
       } catch(e) {
-        alert('Ошибка сетевого запроса: ' + e.message);
+        alert((currentLang === 'en' ? 'Network error: ' : 'Ошибка сетевого запроса: ') + e.message);
       }
     }
 
@@ -1779,12 +2642,12 @@
         });
 
         if (putRes.ok) {
-          const nowStr = new Date().toLocaleString('ru');
+          const nowStr = new Date().toLocaleString(currentLang === 'en' ? 'en-US' : 'ru-RU');
           localStorage.setItem('tennis_last_cloud_sync', nowStr);
           isCloudPushInProgress = false;
           isSyncing = false;
           updateCloudStatusUI();
-          showCloudToast('Тренировки сохранены в облако GitHub!', true, '☁️');
+          showCloudToast(t('toastSavedCloud'), true, '☁️');
           if (pendingCloudPush) {
             pendingCloudPush = false;
             setTimeout(() => triggerAutoCloudSync(), 500);
@@ -1800,15 +2663,15 @@
           isCloudPushInProgress = false;
           isSyncing = false;
           updateCloudStatusUI();
-          if (showFeedback) alert('Ошибка сохранения в облако (' + putRes.status + '): ' + (errData.message || ''));
-          showCloudToast('Ошибка синхронизации (' + putRes.status + ')', false, '⚠️');
+          if (showFeedback) alert((currentLang === 'en' ? 'Cloud save error (' : 'Ошибка сохранения в облако (') + putRes.status + '): ' + (errData.message || ''));
+          showCloudToast(t('toastSyncErr') + ' (' + putRes.status + ')', false, '⚠️');
           return false;
         }
       } catch(err) {
         isCloudPushInProgress = false;
         isSyncing = false;
         updateCloudStatusUI();
-        if (showFeedback) alert('Ошибка сети при синхронизации: ' + err.message);
+        if (showFeedback) alert((currentLang === 'en' ? 'Network sync error: ' : 'Ошибка сети при синхронизации: ') + err.message);
         return false;
       }
     }
@@ -1820,7 +2683,6 @@
       try {
         let data = null;
 
-        // 1. Primary method: Fetch from raw GitHub CDN (fastest, no preflight CORS issues, public repo)
         try {
           const rawUrl = 'https://raw.githubusercontent.com/' + GITHUB_REPO_OWNER + '/' + GITHUB_REPO_NAME + '/' + GITHUB_CLOUD_BRANCH + '/' + GITHUB_CLOUD_FILE + '?_t=' + Date.now();
           const rawRes = await fetch(rawUrl);
@@ -1831,7 +2693,6 @@
           console.warn('Raw CDN fetch failed, trying API fallback:', rawErr);
         }
 
-        // 2. Fallback method: GitHub REST API (supports token authorization with valid CORS)
         if (!data) {
           const token = getGitHubToken();
           const apiUrl = 'https://api.github.com/repos/' + GITHUB_REPO_OWNER + '/' + GITHUB_REPO_NAME + '/contents/' + GITHUB_CLOUD_FILE + '?ref=' + GITHUB_CLOUD_BRANCH + '&_t=' + Date.now();
@@ -1869,13 +2730,13 @@
           populateSelects();
           renderCurrentView();
 
-          const nowStr = new Date().toLocaleString('ru');
+          const nowStr = new Date().toLocaleString(currentLang === 'en' ? 'en-US' : 'ru-RU');
           localStorage.setItem('tennis_last_cloud_sync', nowStr);
           isSyncing = false;
           updateCloudStatusUI();
 
           if (notify) {
-            showCloudToast('Загружено из облака: ' + sessions.length + ' тренировок, ' + rackets.length + ' ракеток', true, '📥');
+            showCloudToast(t('toastLoadedCloud', { s: sessions.length, r: rackets.length }), true, '📥');
           }
           return true;
         }
@@ -1895,7 +2756,7 @@
       if (ok) {
         closeCloudModal();
       } else {
-        alert('Не удалось загрузить данные из облака или файл tennis_cloud_database.json еще не создан.');
+        alert(t('pullFailed'));
       }
     }
 
@@ -1913,16 +2774,19 @@
     function switchViewMode(mode) {
       currentMode = mode;
       document.getElementById('tabSingle').classList.toggle('active', mode === 'single');
+      document.getElementById('tabSpin').classList.toggle('active', mode === 'spin');
       document.getElementById('tabCompare').classList.toggle('active', mode === 'compare');
       document.getElementById('tabRackets').classList.toggle('active', mode === 'rackets');
       document.getElementById('tabDynamics').classList.toggle('active', mode === 'dynamics');
 
       document.getElementById('singleSelectorGroup').classList.toggle('hidden', mode !== 'single');
+      document.getElementById('spinSelectorGroup').classList.toggle('hidden', mode !== 'spin');
       document.getElementById('compareSelectorGroup').classList.toggle('hidden', mode !== 'compare');
       document.getElementById('racketsSelectorGroup').classList.toggle('hidden', mode !== 'rackets');
       document.getElementById('dynamicsSelectorGroup').classList.toggle('hidden', mode !== 'dynamics');
 
       document.getElementById('singleView').classList.toggle('hidden', mode !== 'single');
+      document.getElementById('spinView').classList.toggle('hidden', mode !== 'spin');
       document.getElementById('compareView').classList.toggle('hidden', mode !== 'compare');
       document.getElementById('racketsView').classList.toggle('hidden', mode !== 'rackets');
       document.getElementById('dynamicsView').classList.toggle('hidden', mode !== 'dynamics');
@@ -1932,6 +2796,7 @@
 
     function renderCurrentView() {
       if (currentMode === 'single') renderSingleView();
+      else if (currentMode === 'spin') renderSpinView();
       else if (currentMode === 'compare') renderCompareView();
       else if (currentMode === 'rackets') renderRacketsView();
       else if (currentMode === 'dynamics') renderDynamicsView();
@@ -1988,11 +2853,11 @@
             <div class="racket-color-pill" style="background-color: ${r.color};"></div>
             <div>
               <div class="racket-title">${r.name}</div>
-              <div class="racket-specs">${r.specs || 'Спецификации не указаны'} &bull; <span style="color: var(--accent);">${shotCount} ударов в базе</span></div>
+              <div class="racket-specs">${r.specs || t('specsMissing')} &bull; <span style="color: var(--accent);">${shotCount} ${t('shotsInDb')}</span></div>
             </div>
           </div>
           <div style="display: flex; gap: 6px;">
-            <button class="btn btn-secondary" onclick="deleteRacket('${r.id}')" style="padding: 4px 8px; font-size: 11px;">Удалить</button>
+            <button class="btn btn-secondary" onclick="deleteRacket('${r.id}')" style="padding: 4px 8px; font-size: 11px;">${t('deleteBtn')}</button>
           </div>
         `;
         container.appendChild(item);
@@ -2006,7 +2871,7 @@
       const specs = specsInput.value.trim();
 
       if (!name) {
-        alert('Пожалуйста, введите название ракетки.');
+        alert(t('enterRacketName'));
         return;
       }
 
@@ -2027,10 +2892,10 @@
 
     function deleteRacket(id) {
       if (rackets.length <= 1) {
-        alert('В системе должна оставаться хотя бы одна ракетка.');
+        alert(t('minOneRacket'));
         return;
       }
-      if (confirm('Удалить эту ракетку? Привязанные к ней этапы потеряют связь.')) {
+      if (confirm(t('confirmDelRacket'))) {
         rackets = rackets.filter(r => r.id !== id);
         saveRackets(true);
         renderRacketsList();
@@ -2039,31 +2904,21 @@
     }
 
     function updateRacketSelects() {
-      const sFilt = document.getElementById('singleRacketFilter');
-      if (sFilt) {
-        let cur = sFilt.value;
-        sFilt.innerHTML = '<option value="all">Все ракетки</option>';
-        rackets.forEach(r => {
-          let opt = document.createElement('option');
-          opt.value = r.id;
-          opt.textContent = '🎾 ' + r.name;
-          sFilt.appendChild(opt);
-        });
-        sFilt.value = cur || 'all';
-      }
-
-      const dFilt = document.getElementById('dynamicsRacketFilter');
-      if (dFilt) {
-        let cur = dFilt.value;
-        dFilt.innerHTML = '<option value="all">Все ракетки</option>';
-        rackets.forEach(r => {
-          let opt = document.createElement('option');
-          opt.value = r.id;
-          opt.textContent = '🎾 ' + r.name;
-          dFilt.appendChild(opt);
-        });
-        dFilt.value = cur || 'all';
-      }
+      const selectIds = ['singleRacketFilter', 'spinRacketFilter', 'dynamicsRacketFilter'];
+      selectIds.forEach(selId => {
+        const el = document.getElementById(selId);
+        if (el) {
+          let cur = el.value;
+          el.innerHTML = '<option value="all">' + t('optAllRackets') + '</option>';
+          rackets.forEach(r => {
+            let opt = document.createElement('option');
+            opt.value = r.id;
+            opt.textContent = '🎾 ' + r.name;
+            el.appendChild(opt);
+          });
+          el.value = (cur && Array.from(el.options).some(o => o.value === cur)) ? cur : 'all';
+        }
+      });
     }
 
     function onMarkRacketChange(sessionId, mark, racketId) {
@@ -2151,7 +3006,7 @@
         block.style.borderRadius = '8px';
         block.style.padding = '12px';
 
-        let html = '<div style="font-weight: 700; color: #fff; margin-bottom: 8px;">📅 ' + sess.date + ' — ' + sess.name + ' (' + sess.shots.length + ' уд.)</div>';
+        let html = '<div style="font-weight: 700; color: #fff; margin-bottom: 8px;">📅 ' + sess.date + ' — ' + sess.name + ' (' + sess.shots.length + ' ' + t('unitShots') + ')</div>';
         html += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px;">';
 
         uniqueMarks.forEach(mk => {
@@ -2160,7 +3015,7 @@
           html += `
             <div style="background: rgba(255,255,255,0.03); padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
               <div style="font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 4px;">
-                Mark ${mk} (${count} уд.)
+                Mark ${mk} (${count} ${t('unitShots')})
               </div>
               <select class="upload-mark-select" data-sess="${sess.id}" data-mark="${mk}" style="width: 100%; font-size: 12px;">
                 ${rackets.map(r => `<option value="${r.id}" ${r.id === curRacketId ? 'selected' : ''}>🎾 ${r.name}</option>`).join('')}
@@ -2329,31 +3184,34 @@
 
     function populateSelects() {
       const sSelect = document.getElementById('singleSessionSelect');
+      const spinSess = document.getElementById('spinSessionFilter');
       const cmpA = document.getElementById('compareSessionA');
       const cmpB = document.getElementById('compareSessionB');
       const rFilt = document.getElementById('racketsSessionFilter');
 
       sSelect.innerHTML = '';
+      if (spinSess) spinSess.innerHTML = '<option value="all">' + t('optAllSessions') + '</option>';
       cmpA.innerHTML = '';
       cmpB.innerHTML = '';
-      rFilt.innerHTML = '<option value="all">Все загруженные тренировки</option>';
+      rFilt.innerHTML = '<option value="all">' + t('optAllSessions') + '</option>';
 
       if (sessions.length === 0) {
-        sSelect.innerHTML = '<option value="">(Нет сессий)</option>';
-        cmpA.innerHTML = '<option value="">(Нет сессий)</option>';
-        cmpB.innerHTML = '<option value="">(Нет сессий)</option>';
+        sSelect.innerHTML = '<option value="">' + t('noSessionsOpt') + '</option>';
+        cmpA.innerHTML = '<option value="">' + t('noSessionsOpt') + '</option>';
+        cmpB.innerHTML = '<option value="">' + t('noSessionsOpt') + '</option>';
         return;
       }
 
       sessions.forEach((s) => {
         let opt1 = document.createElement('option');
         opt1.value = s.id;
-        opt1.textContent = '📅 ' + s.date + ' (' + s.shots.length + ' уд.) - ' + s.name;
+        opt1.textContent = '📅 ' + s.date + ' (' + s.shots.length + ' ' + t('unitShots') + ') - ' + s.name;
         sSelect.appendChild(opt1);
 
         let optA = opt1.cloneNode(true);
         let optB = opt1.cloneNode(true);
         let optR = opt1.cloneNode(true);
+        if (spinSess) spinSess.appendChild(opt1.cloneNode(true));
         cmpA.appendChild(optA);
         cmpB.appendChild(optB);
         rFilt.appendChild(optR);
@@ -2363,6 +3221,9 @@
         selectedSessionId = sessions[sessions.length - 1].id;
       }
       sSelect.value = selectedSessionId;
+      if (spinSess) {
+        spinSess.value = (spinSessionFilterId && (spinSessionFilterId === 'all' || sessions.some(s => s.id === spinSessionFilterId))) ? spinSessionFilterId : 'all';
+      }
 
       if (!compareSessionAId || !sessions.some(s => s.id === compareSessionAId)) {
         compareSessionAId = sessions[0].id;
@@ -2372,7 +3233,7 @@
       }
       cmpA.value = compareSessionAId;
       cmpB.value = compareSessionBId;
-      rFilt.value = racketsSessionFilterId || 'all';
+      rFilt.value = (racketsSessionFilterId && (racketsSessionFilterId === 'all' || sessions.some(s => s.id === racketsSessionFilterId))) ? racketsSessionFilterId : 'all';
 
       updateRacketSelects();
     }
@@ -2414,42 +3275,43 @@
           maxShotObj = s;
         }
 
-        let t = s.shotType.toLowerCase();
-        if (t.includes('serve') || t.includes('smash')) serves.push(s);
-        if (t.includes('forehand') || t.includes('fh')) forehands++;
-        if (t.includes('backhand') || t.includes('bh')) backhands++;
+        let tp = s.shotType.toLowerCase();
+        if (tp.includes('serve') || tp.includes('smash')) serves.push(s);
+        if (tp.includes('forehand') || tp.includes('fh')) forehands++;
+        if (tp.includes('backhand') || tp.includes('bh')) backhands++;
       });
 
       let avgSwing = count > 0 ? (totalSwingSpeed / count) : 0;
       let avgBall = count > 0 ? (totalBallSpeed / count) : 0;
+      const kphUnit = t('unitKph');
 
       document.getElementById('kpiShotsCount').textContent = count;
       let firstTime = shots[0] ? shots[0].realTime : '';
       let lastTime = shots[count - 1] ? shots[count - 1].realTime : '';
-      let durText = firstTime && lastTime ? (firstTime + ' — ' + lastTime) : ('Сессия: ' + session.date);
+      let durText = firstTime && lastTime ? (firstTime + ' — ' + lastTime) : (t('kpiSessionPrefix') + session.date);
       if (singleRacketFilterId !== 'all') {
         let rObj = getRacketById(singleRacketFilterId);
-        durText += rObj ? (' (только ' + rObj.name + ')') : '';
+        durText += rObj ? (' (' + t('kpiOnlyRacket') + rObj.name + ')') : '';
       }
       document.getElementById('kpiSessionDuration').textContent = durText;
 
-      document.getElementById('kpiAvgSwing').innerHTML = avgSwing.toFixed(1) + ' <span class="kpi-unit">км/ч</span>';
-      document.getElementById('kpiAvgBall').textContent = '⚡ Мяч: ~' + avgBall.toFixed(1) + ' км/ч';
+      document.getElementById('kpiAvgSwing').innerHTML = avgSwing.toFixed(1) + ' <span class="kpi-unit">' + kphUnit + '</span>';
+      document.getElementById('kpiAvgBall').textContent = t('kpiBallEstPrefix') + avgBall.toFixed(1) + ' ' + kphUnit;
 
-      document.getElementById('kpiMaxSwing').innerHTML = maxSwing.toFixed(1) + ' <span class="kpi-unit">км/ч</span>';
-      document.getElementById('kpiMaxBall').textContent = '⚡ Мяч: ~' + maxBall.toFixed(1) + ' км/ч';
+      document.getElementById('kpiMaxSwing').innerHTML = maxSwing.toFixed(1) + ' <span class="kpi-unit">' + kphUnit + '</span>';
+      document.getElementById('kpiMaxBall').textContent = t('kpiBallEstPrefix') + maxBall.toFixed(1) + ' ' + kphUnit;
       document.getElementById('kpiMaxType').textContent = maxShotObj ? maxShotObj.shotType : '-';
 
       if (serves.length > 0) {
         let serveAvgSwing = serves.reduce((acc, s) => acc + s.swingSpeed, 0) / serves.length;
         let serveAvgBall = serveAvgSwing * getPlowMultiplier('serve', physicsMultiplier);
         let serveMaxSwing = Math.max(...serves.map(s => s.swingSpeed));
-        document.getElementById('kpiServeAvg').innerHTML = serveAvgSwing.toFixed(1) + ' <span class="kpi-unit">км/ч</span>';
-        document.getElementById('kpiServeBall').textContent = '⚡ Мяч: ~' + serveAvgBall.toFixed(1) + ' км/ч';
-        document.getElementById('kpiServeMax').textContent = 'Пик мах: ' + serveMaxSwing.toFixed(1) + ' км/ч (' + serves.length + ' подач)';
+        document.getElementById('kpiServeAvg').innerHTML = serveAvgSwing.toFixed(1) + ' <span class="kpi-unit">' + kphUnit + '</span>';
+        document.getElementById('kpiServeBall').textContent = t('kpiBallEstPrefix') + serveAvgBall.toFixed(1) + ' ' + kphUnit;
+        document.getElementById('kpiServeMax').textContent = t('kpiPeakSwingPrefix') + serveMaxSwing.toFixed(1) + ' ' + kphUnit + ' (' + serves.length + ' ' + t('kpiServesCount') + ')';
       } else {
-        document.getElementById('kpiServeAvg').innerHTML = '- <span class="kpi-unit">км/ч</span>';
-        document.getElementById('kpiServeBall').textContent = 'Подач не зафиксировано';
+        document.getElementById('kpiServeAvg').innerHTML = '- <span class="kpi-unit">' + kphUnit + '</span>';
+        document.getElementById('kpiServeBall').textContent = t('kpiNoServes');
         document.getElementById('kpiServeMax').textContent = '-';
       }
 
@@ -2458,7 +3320,7 @@
         let fhPct = Math.round((forehands / totalGround) * 100);
         let bhPct = 100 - fhPct;
         document.getElementById('kpiBalanceRatio').textContent = fhPct + '% FH / ' + bhPct + '% BH';
-        document.getElementById('kpiDominantHand').textContent = fhPct >= bhPct ? ('Форхенд (' + forehands + ' из ' + totalGround + ')') : ('Бэкхенд (' + backhands + ' из ' + totalGround + ')');
+        document.getElementById('kpiDominantHand').textContent = fhPct >= bhPct ? (t('kpiFhDom') + ' (' + forehands + ' ' + t('kpiOfWord') + ' ' + totalGround + ')') : (t('kpiBhDom') + ' (' + backhands + ' ' + t('kpiOfWord') + ' ' + totalGround + ')');
       } else {
         document.getElementById('kpiBalanceRatio').textContent = '-';
         document.getElementById('kpiDominantHand').textContent = '-';
@@ -2481,6 +3343,7 @@
         let r = getRacketForMark(session, s.mark);
         return r ? r.color : getShotColor(s.shotType);
       });
+      const kphUnit = t('unitKph');
 
       timelineChart = new Chart(ctx, {
         type: 'line',
@@ -2488,7 +3351,7 @@
           labels: labels,
           datasets: [
             {
-              label: 'Скорость маха (км/ч)',
+              label: t('colAvgSwing') + ' (' + kphUnit + ')',
               data: swingSpeeds,
               borderColor: '#10b981',
               backgroundColor: 'rgba(16, 185, 129, 0.08)',
@@ -2500,7 +3363,7 @@
               fill: true
             },
             {
-              label: 'Расчетная скорость мяча (км/ч)',
+              label: t('colAvgBall') + ' (' + kphUnit + ')',
               data: ballSpeeds,
               borderColor: '#3b82f6',
               borderDash: [4, 4],
@@ -2519,7 +3382,7 @@
               grid: { display: false }
             },
             y: {
-              title: { display: true, text: 'Скорость (км/ч)', color: '#8494ab' },
+              title: { display: true, text: kphUnit, color: '#8494ab' },
               ticks: { color: '#8494ab' },
               grid: { color: '#1f2d47' }
             }
@@ -2531,12 +3394,15 @@
                 afterLabel: (ctx) => {
                   let s = shots[ctx.dataIndex];
                   let r = getRacketForMark(session, s.mark);
+                  let ang = getSwingAngleDeg(s);
+                  let sp = getEstBallSpin(s);
                   return [
-                    'Тип: ' + s.shotType,
-                    'Маркер (Mark): ' + s.mark,
-                    'Ракетка: ' + (r ? r.name : 'Не назначена'),
-                    'Вращение кисти: ' + s.wristRot + ' rpm',
-                    'Замах: ' + s.swingTime + ' мс'
+                    t('colShotType') + ': ' + s.shotType,
+                    'Mark: ' + s.mark,
+                    t('colRacket') + ': ' + (r ? r.name : t('notAssigned')),
+                    t('colAvgAngle') + ': ' + (ang >= 0 ? '+' : '') + ang + '°',
+                    t('colAvgWristRot') + ': ' + s.wristRot + ' rpm (~' + sp + ' rpm)',
+                    t('colAvgDuration') + ': ' + s.swingTime + ' ' + t('unitMs')
                   ];
                 }
               }
@@ -2599,6 +3465,7 @@
       });
 
       const sortedMarks = Array.from(marksMap.values()).sort((a, b) => a.mark - b.mark);
+      const kphUnit = t('unitKph');
 
       sortedMarks.forEach(m => {
         let count = m.shots.length;
@@ -2606,6 +3473,8 @@
         let maxSwing = Math.max(...m.shots.map(s => s.swingSpeed));
         let avgBall = avgSwing * physicsMultiplier;
         let avgSpin = m.shots.reduce((acc, s) => acc + s.wristRot, 0) / count;
+        let avgAng = m.shots.reduce((acc, s) => acc + getSwingAngleDeg(s), 0) / count;
+        let avgEst = m.shots.reduce((acc, s) => acc + getEstBallSpin(s), 0) / count;
 
         let curRacket = getRacketForMark(session, m.mark);
         let curRacketId = curRacket ? curRacket.id : '';
@@ -2620,34 +3489,38 @@
 
           <div class="mark-racket-row">
             <div class="mark-racket-label">
-              <span>Используемая ракетка:</span>
+              <span>${t('usedRacketLbl')}</span>
               ${curRacket ? `<span class="racket-badge" style="border-color:${curRacket.color}; color:${curRacket.color};"><span class="racket-dot" style="background-color:${curRacket.color};"></span>${curRacket.name}</span>` : ''}
             </div>
             <select class="mark-racket-select" onchange="onMarkRacketChange('${session.id}', ${m.mark}, this.value)">
-              <option value="">— Ракетка не выбрана —</option>
+              <option value="">${t('racketNotSelected')}</option>
               ${rackets.map(r => `<option value="${r.id}" ${r.id === curRacketId ? 'selected' : ''}>🎾 ${r.name}</option>`).join('')}
             </select>
             ${curRacket && curRacket.specs ? `<div style="font-size: 11px; color: var(--text-muted);">${curRacket.specs}</div>` : ''}
           </div>
 
           <div style="font-size: 14px; font-weight: 700; color: #fff; margin: 2px 0;">
-            ${count} ударов (${Math.round(count / shots.length * 100)}%)
+            ${count} ${t('shotsWord')} (${Math.round(count / shots.length * 100)}%)
           </div>
           <div class="mark-stat-row">
-            <span style="color: var(--text-muted);">Ср. скорость маха:</span>
-            <span style="font-weight: 600; color: #fff;">${avgSwing.toFixed(1)} км/ч</span>
+            <span style="color: var(--text-muted);">${t('avgSwingLbl')}</span>
+            <span style="font-weight: 600; color: #fff;">${avgSwing.toFixed(1)} ${kphUnit}</span>
           </div>
           <div class="mark-stat-row">
-            <span style="color: var(--text-muted);">Расчетный мяч:</span>
-            <span style="font-weight: 600; color: var(--accent);">~${avgBall.toFixed(1)} км/ч</span>
+            <span style="color: var(--text-muted);">${t('estBallLbl')}</span>
+            <span style="font-weight: 600; color: var(--accent);">~${avgBall.toFixed(1)} ${kphUnit}</span>
           </div>
           <div class="mark-stat-row">
-            <span style="color: var(--text-muted);">Пиковая скорость:</span>
-            <span style="font-weight: 600; color: #f59e0b;">${maxSwing.toFixed(1)} км/ч</span>
+            <span style="color: var(--text-muted);">${t('peakSpeedLbl')}</span>
+            <span style="font-weight: 600; color: #f59e0b;">${maxSwing.toFixed(1)} ${kphUnit}</span>
           </div>
           <div class="mark-stat-row">
-            <span style="color: var(--text-muted);">Ср. вращение кисти:</span>
-            <span style="font-weight: 600; color: ${avgSpin >= 0 ? '#34d399' : '#f87171'};">${avgSpin.toFixed(0)} rpm</span>
+            <span style="color: var(--text-muted);">${t('avgAngleLbl')}</span>
+            <span style="font-weight: 600; color: #60a5fa;">${avgAng >= 0 ? '+' : ''}${avgAng.toFixed(1)}°</span>
+          </div>
+          <div class="mark-stat-row">
+            <span style="color: var(--text-muted);">${t('estSpinLbl')}</span>
+            <span style="font-weight: 600; color: #c084fc;">~${avgEst.toFixed(0)} rpm (${avgSpin.toFixed(0)})</span>
           </div>
         `;
         container.appendChild(card);
@@ -2660,29 +3533,31 @@
 
       const statsMap = new Map();
       shots.forEach(s => {
-        let t = s.shotType;
-        if (!statsMap.has(t)) {
-          statsMap.set(t, {
-            shotType: t,
+        let tp = s.shotType;
+        if (!statsMap.has(tp)) {
+          statsMap.set(tp, {
+            shotType: tp,
             count: 0,
             sumSwing: 0,
             maxSwing: 0,
             sumBall: 0,
-            maxBall: 0,
+            sumAngle: 0,
             sumWristRot: 0,
+            sumEstSpin: 0,
             sumDuration: 0
           });
         }
-        let st = statsMap.get(t);
-        let plow = getPlowMultiplier(t, physicsMultiplier);
+        let st = statsMap.get(tp);
+        let plow = getPlowMultiplier(tp, physicsMultiplier);
         let ball = s.swingSpeed * plow;
 
         st.count++;
         st.sumSwing += s.swingSpeed;
         if (s.swingSpeed > st.maxSwing) st.maxSwing = s.swingSpeed;
         st.sumBall += ball;
-        if (ball > st.maxBall) st.maxBall = ball;
+        st.sumAngle += getSwingAngleDeg(s);
         st.sumWristRot += s.wristRot;
+        st.sumEstSpin += getEstBallSpin(s);
         st.sumDuration += s.swingTime;
       });
 
@@ -2693,8 +3568,9 @@
         avgSwing: +(st.sumSwing / st.count).toFixed(1),
         avgBall: +(st.sumBall / st.count).toFixed(1),
         maxSwing: +st.maxSwing.toFixed(1),
-        maxBall: +st.maxBall.toFixed(1),
+        avgAngle: +(st.sumAngle / st.count).toFixed(1),
         avgWristRot: +(st.sumWristRot / st.count).toFixed(0),
+        avgEstSpin: +(st.sumEstSpin / st.count).toFixed(0),
         avgDuration: +(st.sumDuration / st.count).toFixed(0)
       }));
 
@@ -2708,17 +3584,19 @@
       });
 
       list.forEach(row => {
+        let traj = getSwingTrajectoryInfo(row.avgAngle);
         let tr = document.createElement('tr');
         tr.innerHTML = `
           <td><span class="pill ${getPillClass(row.shotType)}">${row.shotType}</span></td>
           <td><b>${row.count}</b></td>
           <td>${row.share}%</td>
-          <td><b style="color: #fff;">${row.avgSwing}</b></td>
+          <td><b style="color: #fff;">${row.avgSwing}</b> <span style="font-size:11px;color:var(--text-muted);">${t('unitKph')}</span></td>
           <td><b style="color: var(--accent);">${row.avgBall}</b></td>
           <td>${row.maxSwing}</td>
-          <td>${row.maxBall}</td>
+          <td><span class="angle-badge ${traj.cls}">${traj.arrow} ${row.avgAngle >= 0 ? '+' : ''}${row.avgAngle}°</span></td>
           <td style="color: ${row.avgWristRot >= 0 ? '#34d399' : '#f87171'};">${row.avgWristRot}</td>
-          <td>${row.avgDuration}</td>
+          <td style="color: #c084fc; font-weight: 600;">~${row.avgEstSpin}</td>
+          <td>${row.avgDuration} ${t('unitMs')}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -2734,20 +3612,512 @@
       renderSingleView();
     }
 
+    // ================= 1.5 SPIN & IMPACT ANGLE VIEW =================
+    function setSpinMechMetric(metric) {
+      spinMechMetric = metric;
+      document.getElementById('pillSpinAngle').classList.toggle('active', metric === 'angle');
+      document.getElementById('pillSpinWrist').classList.toggle('active', metric === 'wristRot');
+      document.getElementById('pillSpinElev').classList.toggle('active', metric === 'wristElev');
+      document.getElementById('pillSpinEst').classList.toggle('active', metric === 'estSpin');
+      renderSpinView();
+    }
+
+    function getFilteredSpinShots() {
+      let targetSessions = sessions;
+      if (spinSessionFilterId !== 'all') {
+        targetSessions = sessions.filter(s => s.id === spinSessionFilterId);
+      }
+
+      const shotsOut = [];
+      targetSessions.forEach(sess => {
+        sess.shots.forEach(s => {
+          let r = getRacketForMark(sess, s.mark);
+          if (spinRacketFilterId !== 'all') {
+            if (!r || r.id !== spinRacketFilterId) return;
+          }
+          if (!matchesShotFilter(s.shotType, spinShotFilterType)) return;
+          shotsOut.push({
+            ...s,
+            angleDeg: getSwingAngleDeg(s),
+            estSpin: getEstBallSpin(s),
+            racket: r,
+            sessionDate: sess.date
+          });
+        });
+      });
+      return shotsOut;
+    }
+
+    function renderSpinView() {
+      const shots = getFilteredSpinShots();
+      renderSpinVerdict(shots);
+      renderSpinKpis(shots);
+      renderSpinScatterChart(shots);
+      renderSpinMechanicsChart(shots);
+      renderSpinAngleHistChart(shots);
+      renderSpinRacketChart(shots);
+      renderSpinTable(shots);
+    }
+
+    function renderSpinVerdict(shots) {
+      const container = document.getElementById('spinVerdictList');
+      container.innerHTML = '';
+
+      if (shots.length === 0) {
+        container.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">' + t('noShotsSelected') + '</div>';
+        return;
+      }
+
+      const fhTop = shots.filter(s => s.shotType.toLowerCase().includes('forehand topspin'));
+      const fhFlat = shots.filter(s => s.shotType.toLowerCase().includes('forehand flat'));
+      const slices = shots.filter(s => s.shotType.toLowerCase().includes('slice'));
+
+      const avg = (arr, fn) => arr.length > 0 ? arr.reduce((a, b) => a + fn(b), 0) / arr.length : 0;
+
+      const angFhTop = avg(fhTop, s => s.angleDeg);
+      const angFhFlat = avg(fhFlat, s => s.angleDeg);
+      const spinFhTop = avg(fhTop, s => s.estSpin);
+      const spinFhFlat = avg(fhFlat, s => s.estSpin);
+      const angDiff = angFhTop - angFhFlat;
+
+      let pathMsg = '';
+      if (fhTop.length > 0 && fhFlat.length > 0) {
+        pathMsg = currentLang === 'en'
+          ? ('Forehand Topspin path is <b>+' + angFhTop.toFixed(1) + '°</b> vs Flat <b>' + (angFhFlat >= 0 ? '+' : '') + angFhFlat.toFixed(1) + '°</b> (gap <b>Δ ' + angDiff.toFixed(1) + '°</b>). ' + (angDiff >= 12 ? 'Clear mechanical separation between brush and flat drive!' : 'Topspin and flat attack angles are close — try dipping under the ball more for heavy spin.'))
+          : ('Траектория FH Топспин: <b>+' + angFhTop.toFixed(1) + '°</b> против Плоского <b>' + (angFhFlat >= 0 ? '+' : '') + angFhFlat.toFixed(1) + '°</b> (разница <b>Δ ' + angDiff.toFixed(1) + '°</b>). ' + (angDiff >= 12 ? 'Отличное разделение техники накрутки и плоского удара!' : 'Углы топспина и плоского удара близки — для более тяжелого вращения опускайте головку ракетки глубже под мяч.'));
+      } else {
+        let allAng = avg(shots, s => s.angleDeg);
+        pathMsg = (currentLang === 'en' ? 'Average swing attack angle in selection: ' : 'Средний угол атаки в выборке: ') + '<b>' + (allAng >= 0 ? '+' : '') + allAng.toFixed(1) + '°</b>.';
+      }
+
+      // Spin efficiency: shot type with highest est spin
+      const byType = new Map();
+      shots.forEach(s => {
+        if (!byType.has(s.shotType)) byType.set(s.shotType, { sumSpin: 0, count: 0, sumWrist: 0 });
+        let o = byType.get(s.shotType);
+        o.sumSpin += s.estSpin;
+        o.sumWrist += Math.abs(s.wristRot);
+        o.count++;
+      });
+      let topSpinType = Array.from(byType.entries()).map(([k, v]) => ({ type: k, avgSpin: v.sumSpin / v.count, avgWrist: v.sumWrist / v.count })).sort((a, b) => b.avgSpin - a.avgSpin)[0];
+
+      let spinMsg = topSpinType
+        ? (currentLang === 'en'
+            ? ('Highest spin intensity on <b>' + topSpinType.type + '</b> (~<b>' + Math.round(topSpinType.avgSpin) + ' rpm</b>, wrist snap ' + Math.round(topSpinType.avgWrist) + ' rpm).')
+            : ('Максимум вращения генерируется на <b>' + topSpinType.type + '</b> (~<b>' + Math.round(topSpinType.avgSpin) + ' rpm</b>, кисть ' + Math.round(topSpinType.avgWrist) + ' rpm).'))
+        : '-';
+
+      let sliceMsg = slices.length > 0
+        ? (currentLang === 'en'
+            ? ('Slices (' + slices.length + ' shots) carve downward at <b>' + avg(slices, s => s.angleDeg).toFixed(1) + '°</b> with avg wrist elevation <b>' + avg(slices, s => s.wristElev).toFixed(1) + ' rpm</b> (~' + Math.round(avg(slices, s => s.estSpin)) + ' rpm underspin).')
+            : ('Резаные удары (' + slices.length + ' ' + t('unitShots') + ') идут по траектории <b>' + avg(slices, s => s.angleDeg).toFixed(1) + '°</b> при вертикальном ходе кисти <b>' + avg(slices, s => s.wristElev).toFixed(1) + ' rpm</b> (~' + Math.round(avg(slices, s => s.estSpin)) + ' rpm).'))
+        : (currentLang === 'en'
+            ? ('Forehand topspin generates ~' + Math.round(spinFhTop) + ' rpm vs Flat ~' + Math.round(spinFhFlat) + ' rpm.')
+            : ('FH Топспин дает ~' + Math.round(spinFhTop) + ' rpm против ~' + Math.round(spinFhFlat) + ' rpm на плоском ударе.'));
+
+      const items = [
+        { title: currentLang === 'en' ? '📐 Attack Angle Separation' : '📐 Разделение углов атаки', desc: pathMsg },
+        { title: currentLang === 'en' ? '🌀 Peak Spin Mechanics' : '🌀 Генерация вращения (Spin)', desc: spinMsg },
+        { title: currentLang === 'en' ? '🔪 Carve & Brush Depth' : '🔪 Проводка и слайсы', desc: sliceMsg }
+      ];
+
+      items.forEach(it => {
+        let div = document.createElement('div');
+        div.className = 'verdict-item';
+        div.innerHTML = '<strong>' + it.title + '</strong><span>' + it.desc + '</span>';
+        container.appendChild(div);
+      });
+    }
+
+    function renderSpinKpis(shots) {
+      if (shots.length === 0) {
+        document.getElementById('spinKpiAvgAngle').textContent = '0°';
+        document.getElementById('spinKpiAngleProfile').textContent = '-';
+        document.getElementById('spinKpiFhAngles').textContent = '-';
+        document.getElementById('spinKpiFhGap').textContent = '-';
+        document.getElementById('spinKpiWristRot').innerHTML = '0 <span class="kpi-unit">rpm</span>';
+        document.getElementById('spinKpiWristTopspin').textContent = '-';
+        document.getElementById('spinKpiEstSpin').innerHTML = '~0 <span class="kpi-unit">rpm</span>';
+        document.getElementById('spinKpiPeakSpin').textContent = '-';
+        document.getElementById('spinKpiWristElev').innerHTML = '0 <span class="kpi-unit">rpm</span>';
+        document.getElementById('spinKpiArmVar').textContent = '-';
+        return;
+      }
+
+      const avg = fn => shots.reduce((a, s) => a + fn(s), 0) / shots.length;
+      const avgAng = avg(s => s.angleDeg);
+      const traj = getSwingTrajectoryInfo(avgAng);
+      document.getElementById('spinKpiAvgAngle').innerHTML = (avgAng >= 0 ? '+' : '') + avgAng.toFixed(1) + '°';
+      document.getElementById('spinKpiAngleProfile').textContent = traj.arrow + ' ' + traj.label;
+
+      const fhTop = shots.filter(s => s.shotType.toLowerCase().includes('forehand topspin'));
+      const fhFlat = shots.filter(s => s.shotType.toLowerCase().includes('forehand flat'));
+      if (fhTop.length > 0 || fhFlat.length > 0) {
+        let aT = fhTop.length > 0 ? fhTop.reduce((a,s) => a + s.angleDeg, 0) / fhTop.length : null;
+        let aF = fhFlat.length > 0 ? fhFlat.reduce((a,s) => a + s.angleDeg, 0) / fhFlat.length : null;
+        document.getElementById('spinKpiFhAngles').textContent = (aT !== null ? ('+' + aT.toFixed(1) + '°') : '-') + ' / ' + (aF !== null ? ((aF >= 0 ? '+' : '') + aF.toFixed(1) + '°') : '-');
+        document.getElementById('spinKpiFhGap').textContent = (aT !== null && aF !== null)
+          ? ((currentLang === 'en' ? 'Separation Δ: ' : 'Разница углов Δ: ') + (aT - aF).toFixed(1) + '°')
+          : (currentLang === 'en' ? 'FH Topspin vs Flat' : 'Топспин против Плоского');
+      } else {
+        document.getElementById('spinKpiFhAngles').textContent = '-';
+        document.getElementById('spinKpiFhGap').textContent = '-';
+      }
+
+      const avgWrist = avg(s => Math.abs(s.wristRot));
+      const fhWrist = fhTop.length > 0 ? fhTop.reduce((a, s) => a + s.wristRot, 0) / fhTop.length : 0;
+      document.getElementById('spinKpiWristRot').innerHTML = avgWrist.toFixed(1) + ' <span class="kpi-unit">rpm</span>';
+      document.getElementById('spinKpiWristTopspin').textContent = fhTop.length > 0
+        ? ('FH Topspin: ' + (fhWrist >= 0 ? '+' : '') + fhWrist.toFixed(1) + ' rpm')
+        : (currentLang === 'en' ? 'Absolute wrist snap speed' : 'Модуль скорости вращения кисти');
+
+      const avgSpin = avg(s => s.estSpin);
+      let maxSpinShot = shots.reduce((best, s) => s.estSpin > best.estSpin ? s : best, shots[0]);
+      document.getElementById('spinKpiEstSpin').innerHTML = '~' + Math.round(avgSpin) + ' <span class="kpi-unit">rpm</span>';
+      document.getElementById('spinKpiPeakSpin').textContent = (currentLang === 'en' ? 'Peak: ~' : 'Пик: ~') + maxSpinShot.estSpin + ' rpm (' + maxSpinShot.shotType + ')';
+
+      const avgElev = avg(s => s.wristElev);
+      const avgVar = avg(s => s.variance);
+      const avgArm = avg(s => Math.abs(s.armRot));
+      document.getElementById('spinKpiWristElev').innerHTML = (avgElev >= 0 ? '+' : '') + avgElev.toFixed(1) + ' <span class="kpi-unit">rpm</span>';
+      document.getElementById('spinKpiArmVar').textContent = (currentLang === 'en' ? 'Arm: ' : 'Рука: ') + avgArm.toFixed(0) + ' rpm • Var: ' + avgVar.toFixed(2);
+    }
+
+    function renderSpinScatterChart(shots) {
+      const ctx = document.getElementById('spinScatterChart').getContext('2d');
+      if (spinScatterChart) spinScatterChart.destroy();
+
+      const grouped = new Map();
+      shots.forEach(s => {
+        if (!grouped.has(s.shotType)) grouped.set(s.shotType, []);
+        grouped.get(s.shotType).push({
+          x: s.angleDeg,
+          y: s.swingSpeed,
+          estSpin: s.estSpin,
+          wristRot: s.wristRot,
+          wristElev: s.wristElev,
+          racket: s.racket ? s.racket.name : t('notAssigned')
+        });
+      });
+
+      const datasets = Array.from(grouped.entries()).map(([shotType, pts]) => {
+        const col = getShotColor(shotType);
+        // Sample if very large to keep scatter responsive (>1500 points)
+        const step = pts.length > 400 ? Math.ceil(pts.length / 400) : 1;
+        const sampled = step > 1 ? pts.filter((_, idx) => idx % step === 0) : pts;
+        return {
+          label: shotType + ' (' + pts.length + ')',
+          data: sampled,
+          backgroundColor: col + '99',
+          borderColor: col,
+          borderWidth: 1,
+          pointRadius: 4,
+          pointHoverRadius: 7
+        };
+      });
+
+      spinScatterChart = new Chart(ctx, {
+        type: 'scatter',
+        data: { datasets: datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              title: { display: true, text: currentLang === 'en' ? 'Swing Attack Angle (°) [Slice < 0° < Topspin]' : 'Угол атаки / замаха (°) [Слайс < 0° < Топспин]', color: '#8494ab' },
+              ticks: { color: '#8494ab' },
+              grid: { color: '#1f2d47' },
+              min: -80,
+              max: 70
+            },
+            y: {
+              title: { display: true, text: t('colAvgSwing') + ' (' + t('unitKph') + ')', color: '#8494ab' },
+              ticks: { color: '#8494ab' },
+              grid: { color: '#1f2d47' }
+            }
+          },
+          plugins: {
+            legend: { labels: { color: '#f1f5f9', font: { size: 11 } } },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => {
+                  const p = ctx.raw;
+                  return [
+                    ctx.dataset.label.split(' (')[0],
+                    (currentLang === 'en' ? 'Angle: ' : 'Угол: ') + (p.x >= 0 ? '+' : '') + p.x + '°',
+                    (currentLang === 'en' ? 'Speed: ' : 'Скорость: ') + p.y + ' ' + t('unitKph'),
+                    (currentLang === 'en' ? 'Est. Spin: ~' : 'Спин: ~') + p.estSpin + ' rpm',
+                    (currentLang === 'en' ? 'Wrist Rot: ' : 'Кисть: ') + p.wristRot + ' rpm',
+                    t('colRacket') + ': ' + p.racket
+                  ];
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderSpinMechanicsChart(shots) {
+      const ctx = document.getElementById('spinMechanicsChart').getContext('2d');
+      if (spinMechanicsChart) spinMechanicsChart.destroy();
+
+      const byType = new Map();
+      shots.forEach(s => {
+        if (!byType.has(s.shotType)) byType.set(s.shotType, { count: 0, angle: 0, wristRot: 0, wristElev: 0, estSpin: 0 });
+        let o = byType.get(s.shotType);
+        o.count++;
+        o.angle += s.angleDeg;
+        o.wristRot += s.wristRot;
+        o.wristElev += s.wristElev;
+        o.estSpin += s.estSpin;
+      });
+
+      const types = Array.from(byType.keys()).sort();
+      const values = types.map(tp => {
+        let o = byType.get(tp);
+        return +(o[spinMechMetric] / o.count).toFixed(1);
+      });
+      const colors = types.map(tp => getShotColor(tp));
+
+      const metricLabels = {
+        angle: t('colAvgAngle'),
+        wristRot: t('colWristRot'),
+        wristElev: t('colWristElev'),
+        estSpin: t('colEstSpin')
+      };
+
+      spinMechanicsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: types,
+          datasets: [{
+            label: metricLabels[spinMechMetric] || spinMechMetric,
+            data: values,
+            backgroundColor: colors.map(c => c + 'bb'),
+            borderColor: colors,
+            borderWidth: 1.5,
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { ticks: { color: '#8494ab', font: { size: 11 } }, grid: { display: false } },
+            y: { title: { display: true, text: metricLabels[spinMechMetric], color: '#8494ab' }, ticks: { color: '#8494ab' }, grid: { color: '#1f2d47' } }
+          },
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+    }
+
+    function renderSpinAngleHistChart(shots) {
+      const ctx = document.getElementById('spinAngleHistChart').getContext('2d');
+      if (spinAngleHistChart) spinAngleHistChart.destroy();
+
+      const buckets = [
+        { label: '< -45°', min: -999, max: -45, color: '#06b6d4', count: 0 },
+        { label: '-45° .. -25°', min: -45, max: -25, color: '#f59e0b', count: 0 },
+        { label: '-25° .. -10°', min: -25, max: -10, color: '#eab308', count: 0 },
+        { label: '-10° .. +5°', min: -10, max: 5, color: '#60a5fa', count: 0 },
+        { label: '+5° .. +20°', min: 5, max: 20, color: '#3b82f6', count: 0 },
+        { label: '+20° .. +35°', min: 20, max: 35, color: '#10b981', count: 0 },
+        { label: '> +35°', min: 35, max: 999, color: '#a855f7', count: 0 }
+      ];
+
+      shots.forEach(s => {
+        for (let b of buckets) {
+          if (s.angleDeg >= b.min && s.angleDeg < b.max) {
+            b.count++;
+            break;
+          }
+        }
+      });
+
+      spinAngleHistChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: buckets.map(b => b.label),
+          datasets: [{
+            label: t('colCount'),
+            data: buckets.map(b => b.count),
+            backgroundColor: buckets.map(b => b.color + 'cc'),
+            borderColor: buckets.map(b => b.color),
+            borderWidth: 1.5,
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { ticks: { color: '#cbd5e1', font: { size: 11 } }, grid: { display: false } },
+            y: { title: { display: true, text: t('colCount'), color: '#8494ab' }, ticks: { color: '#8494ab' }, grid: { color: '#1f2d47' } }
+          },
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+    }
+
+    function renderSpinRacketChart(shots) {
+      const ctx = document.getElementById('spinRacketChart').getContext('2d');
+      if (spinRacketChart) spinRacketChart.destroy();
+
+      const rMap = new Map();
+      shots.forEach(s => {
+        if (!s.racket) return;
+        if (!rMap.has(s.racket.id)) rMap.set(s.racket.id, { racket: s.racket, count: 0, sumAng: 0, sumSpin: 0 });
+        let o = rMap.get(s.racket.id);
+        o.count++;
+        o.sumAng += s.angleDeg;
+        o.sumSpin += s.estSpin;
+      });
+
+      const list = Array.from(rMap.values());
+      const labels = list.map(o => o.racket.name);
+      const angles = list.map(o => +(o.sumAng / o.count).toFixed(1));
+      const spins = list.map(o => Math.round(o.sumSpin / o.count));
+
+      spinRacketChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: t('colEstSpin'),
+              data: spins,
+              backgroundColor: 'rgba(168, 85, 247, 0.75)',
+              borderColor: '#a855f7',
+              borderWidth: 1.5,
+              yAxisID: 'ySpin',
+              borderRadius: 6
+            },
+            {
+              label: t('colAvgAngle'),
+              data: angles,
+              backgroundColor: 'rgba(16, 185, 129, 0.75)',
+              borderColor: '#10b981',
+              borderWidth: 1.5,
+              yAxisID: 'yAngle',
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { ticks: { color: '#cbd5e1', font: { size: 11 } }, grid: { display: false } },
+            ySpin: {
+              type: 'linear',
+              position: 'left',
+              title: { display: true, text: 'RPM (~)', color: '#c084fc' },
+              ticks: { color: '#c084fc' },
+              grid: { color: '#1f2d47' }
+            },
+            yAngle: {
+              type: 'linear',
+              position: 'right',
+              title: { display: true, text: 'Angle (°)', color: '#34d399' },
+              ticks: { color: '#34d399' },
+              grid: { drawOnChartArea: false }
+            }
+          },
+          plugins: {
+            legend: { labels: { color: '#f1f5f9' } }
+          }
+        }
+      });
+    }
+
+    function renderSpinTable(shots) {
+      const tbody = document.getElementById('spinTableBody');
+      tbody.innerHTML = '';
+
+      const map = new Map();
+      shots.forEach(s => {
+        if (!map.has(s.shotType)) {
+          map.set(s.shotType, {
+            shotType: s.shotType, count: 0, sumSwing: 0, sumAngle: 0,
+            sumWristRot: 0, sumWristElev: 0, sumArmRot: 0, sumEstSpin: 0, sumVar: 0
+          });
+        }
+        let o = map.get(s.shotType);
+        o.count++;
+        o.sumSwing += s.swingSpeed;
+        o.sumAngle += s.angleDeg;
+        o.sumWristRot += s.wristRot;
+        o.sumWristElev += s.wristElev;
+        o.sumArmRot += s.armRot;
+        o.sumEstSpin += s.estSpin;
+        o.sumVar += s.variance;
+      });
+
+      let rows = Array.from(map.values()).map(o => ({
+        shotType: o.shotType,
+        count: o.count,
+        avgSwing: +(o.sumSwing / o.count).toFixed(1),
+        avgAngle: +(o.sumAngle / o.count).toFixed(1),
+        angleRange: +(o.sumAngle / o.count).toFixed(1),
+        avgWristRot: +(o.sumWristRot / o.count).toFixed(1),
+        avgWristElev: +(o.sumWristElev / o.count).toFixed(1),
+        avgArmRot: +(o.sumArmRot / o.count).toFixed(1),
+        avgEstSpin: Math.round(o.sumEstSpin / o.count),
+        avgVariance: +(o.sumVar / o.count).toFixed(2)
+      }));
+
+      rows.sort((a, b) => {
+        let va = a[spinSortCol];
+        let vb = b[spinSortCol];
+        if (typeof va === 'string') return spinSortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+        return spinSortAsc ? va - vb : vb - va;
+      });
+
+      rows.forEach(r => {
+        let traj = getSwingTrajectoryInfo(r.avgAngle);
+        let tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><span class="pill ${getPillClass(r.shotType)}">${r.shotType}</span></td>
+          <td><b>${r.count}</b></td>
+          <td><b style="color:#fff;">${r.avgSwing}</b> <span style="font-size:11px;color:var(--text-muted);">${t('unitKph')}</span></td>
+          <td><span class="angle-badge ${traj.cls}">${traj.arrow} ${r.avgAngle >= 0 ? '+' : ''}${r.avgAngle}°</span></td>
+          <td style="font-size:12px;color:var(--text-muted);">${traj.label}</td>
+          <td style="color:${r.avgWristRot >= 0 ? '#34d399' : '#f87171'};">${r.avgWristRot}</td>
+          <td style="color:${r.avgWristElev >= 0 ? '#60a5fa' : '#fbbf24'};">${r.avgWristElev}</td>
+          <td>${r.avgArmRot}</td>
+          <td style="color:#c084fc;font-weight:700;">~${r.avgEstSpin}</td>
+          <td>${r.avgVariance}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function sortSpinTable(col) {
+      if (spinSortCol === col) spinSortAsc = !spinSortAsc;
+      else { spinSortCol = col; spinSortAsc = false; }
+      renderSpinView();
+    }
+
     // ================= 2. COMPARE 2 SESSIONS VIEW =================
     function renderCompareView() {
       const sessA = sessions.find(s => s.id === compareSessionAId);
       const sessB = sessions.find(s => s.id === compareSessionBId);
       if (!sessA || !sessB) return;
 
-      document.getElementById('thSessionA').textContent = 'А: ' + sessA.date;
-      document.getElementById('thSessionB').textContent = 'Б: ' + sessB.date;
+      document.getElementById('thSessionA').textContent = 'A: ' + sessA.date;
+      document.getElementById('thSessionB').textContent = 'B: ' + sessB.date;
 
       const statsA = calculateSessionStats(sessA);
       const statsB = calculateSessionStats(sessB);
 
       renderVerdict(statsA, statsB, sessA, sessB);
       renderCompareBarChart(statsA, statsB, sessA, sessB);
+      renderCompareAngleSpinChart(statsA, statsB, sessA, sessB);
       renderCompareTable(statsA, statsB, sessA, sessB);
     }
 
@@ -2756,40 +4126,61 @@
       let totalSwing = 0;
       let totalBall = 0;
       let maxSwing = 0;
+      let sumAngle = 0;
+      let sumEstSpin = 0;
+      let sumWristRot = 0;
+      let sumWristElev = 0;
+      let sumVar = 0;
       let serves = [];
+      let fhTops = [];
       let byType = new Map();
 
       shots.forEach(s => {
         let plow = getPlowMultiplier(s.shotType, physicsMultiplier);
         let ball = s.swingSpeed * plow;
+        let ang = getSwingAngleDeg(s);
+        let sp = getEstBallSpin(s);
+
         totalSwing += s.swingSpeed;
         totalBall += ball;
+        sumAngle += ang;
+        sumEstSpin += sp;
+        sumWristRot += s.wristRot;
+        sumWristElev += s.wristElev;
+        sumVar += s.variance;
         if (s.swingSpeed > maxSwing) maxSwing = s.swingSpeed;
 
-        let t = s.shotType.toLowerCase();
-        if (t.includes('serve') || t.includes('smash')) serves.push(s);
+        let tp = s.shotType.toLowerCase();
+        if (tp.includes('serve') || tp.includes('smash')) serves.push(s);
+        if (tp.includes('forehand topspin')) fhTops.push({ ...s, angleDeg: ang, estSpin: sp });
 
         if (!byType.has(s.shotType)) {
-          byType.set(s.shotType, { count: 0, sumSwing: 0, sumWristRot: 0 });
+          byType.set(s.shotType, { count: 0, sumSwing: 0, sumWristRot: 0, sumWristElev: 0, sumAngle: 0, sumEstSpin: 0, sumVar: 0 });
         }
         let o = byType.get(s.shotType);
         o.count++;
         o.sumSwing += s.swingSpeed;
         o.sumWristRot += s.wristRot;
+        o.sumWristElev += s.wristElev;
+        o.sumAngle += ang;
+        o.sumEstSpin += sp;
+        o.sumVar += s.variance;
       });
 
       let count = shots.length;
-      let avgSwing = count > 0 ? (totalSwing / count) : 0;
-      let avgBall = count > 0 ? (totalBall / count) : 0;
-      let serveAvg = serves.length > 0 ? (serves.reduce((acc, s) => acc + s.swingSpeed, 0) / serves.length) : 0;
-
       return {
         count: count,
-        avgSwing: avgSwing,
-        avgBall: avgBall,
+        avgSwing: count > 0 ? (totalSwing / count) : 0,
+        avgBall: count > 0 ? (totalBall / count) : 0,
         maxSwing: maxSwing,
-        serveAvg: serveAvg,
+        serveAvg: serves.length > 0 ? (serves.reduce((acc, s) => acc + s.swingSpeed, 0) / serves.length) : 0,
         servesCount: serves.length,
+        avgAngle: count > 0 ? (sumAngle / count) : 0,
+        fhTopAngle: fhTops.length > 0 ? (fhTops.reduce((acc, s) => acc + s.angleDeg, 0) / fhTops.length) : 0,
+        avgEstSpin: count > 0 ? (sumEstSpin / count) : 0,
+        avgWristRot: count > 0 ? (sumWristRot / count) : 0,
+        avgWristElev: count > 0 ? (sumWristElev / count) : 0,
+        avgVar: count > 0 ? (sumVar / count) : 0,
         byType: byType
       };
     }
@@ -2801,27 +4192,32 @@
       let deltaSwing = b.avgSwing - a.avgSwing;
       let deltaServe = b.serveAvg - a.serveAvg;
       let deltaCount = b.count - a.count;
+      let deltaSpin = b.avgEstSpin - a.avgEstSpin;
+      let deltaFhAngle = b.fhTopAngle - a.fhTopAngle;
+      const kph = t('unitKph');
 
-      let speedText = deltaSwing > 0 
-        ? ('Прирост средней скорости маха на <b>+' + deltaSwing.toFixed(1) + ' км/ч</b> (с ' + a.avgSwing.toFixed(1) + ' до ' + b.avgSwing.toFixed(1) + ' км/ч).')
-        : deltaSwing < 0 
-          ? ('Снижение средней скорости маха на <b>' + deltaSwing.toFixed(1) + ' км/ч</b>.')
-          : ('Средняя скорость маха идентична в обеих тренировках (' + a.avgSwing.toFixed(1) + ' км/ч).');
+      let speedText = currentLang === 'en'
+        ? (deltaSwing > 0 ? 'Avg swing speed increased by <b>+' + deltaSwing.toFixed(1) + ' kph</b> (' + a.avgSwing.toFixed(1) + ' → ' + b.avgSwing.toFixed(1) + ' kph).' : deltaSwing < 0 ? 'Avg swing speed changed by <b>' + deltaSwing.toFixed(1) + ' kph</b>.' : 'Identical avg swing speed (' + a.avgSwing.toFixed(1) + ' kph).')
+        : (deltaSwing > 0 ? 'Прирост средней скорости маха на <b>+' + deltaSwing.toFixed(1) + ' ' + kph + '</b> (с ' + a.avgSwing.toFixed(1) + ' до ' + b.avgSwing.toFixed(1) + ' ' + kph + ').' : deltaSwing < 0 ? 'Снижение средней скорости маха на <b>' + deltaSwing.toFixed(1) + ' ' + kph + '</b>.' : 'Средняя скорость маха идентична (' + a.avgSwing.toFixed(1) + ' ' + kph + ').');
 
       let serveText = (a.serveAvg > 0 && b.serveAvg > 0)
-        ? (deltaServe > 0 
-            ? ('Подача стала мощнее на <b>+' + deltaServe.toFixed(1) + ' км/ч</b> (' + b.serveAvg.toFixed(1) + ' против ' + a.serveAvg.toFixed(1) + ' км/ч).')
-            : ('Скорость подачи изменилась на <b>' + deltaServe.toFixed(1) + ' км/ч</b>.'))
-        : 'Недостаточно данных для полного сравнения подач.';
+        ? (currentLang === 'en'
+            ? ('Serve velocity delta: <b>' + (deltaServe >= 0 ? '+' : '') + deltaServe.toFixed(1) + ' kph</b> (' + b.serveAvg.toFixed(1) + ' vs ' + a.serveAvg.toFixed(1) + ' kph).')
+            : ('Подача изменилась на <b>' + (deltaServe >= 0 ? '+' : '') + deltaServe.toFixed(1) + ' ' + kph + '</b> (' + b.serveAvg.toFixed(1) + ' против ' + a.serveAvg.toFixed(1) + ' ' + kph + ').'))
+        : (currentLang === 'en' ? 'Insufficient serves to compare.' : 'Недостаточно подач для полного сравнения.');
 
-      let volText = deltaCount >= 0 
-        ? ('Объем тренировки вырос на <b>+' + deltaCount + ' ударов</b> (' + b.count + ' против ' + a.count + ').')
-        : ('Объем ударов меньше на <b>' + Math.abs(deltaCount) + '</b> (' + b.count + ' против ' + a.count + ').');
+      let spinAngleText = currentLang === 'en'
+        ? ('Est. spin changed by <b>' + (deltaSpin >= 0 ? '+' : '') + Math.round(deltaSpin) + ' rpm</b> (~' + Math.round(b.avgEstSpin) + ' vs ~' + Math.round(a.avgEstSpin) + ' rpm). FH Topspin angle: <b>' + (b.fhTopAngle >= 0 ? '+' : '') + b.fhTopAngle.toFixed(1) + '°</b> (' + (deltaFhAngle >= 0 ? '+' : '') + deltaFhAngle.toFixed(1) + '°).')
+        : ('Оценка вращения изменилась на <b>' + (deltaSpin >= 0 ? '+' : '') + Math.round(deltaSpin) + ' rpm</b> (~' + Math.round(b.avgEstSpin) + ' vs ~' + Math.round(a.avgEstSpin) + ' rpm). Угол FH Топспин: <b>' + (b.fhTopAngle >= 0 ? '+' : '') + b.fhTopAngle.toFixed(1) + '°</b> (' + (deltaFhAngle >= 0 ? '+' : '') + deltaFhAngle.toFixed(1) + '°).');
+
+      let volText = currentLang === 'en'
+        ? ('Volume: <b>' + (deltaCount >= 0 ? '+' : '') + deltaCount + ' shots</b> (' + b.count + ' vs ' + a.count + ').')
+        : ('Объем: <b>' + (deltaCount >= 0 ? '+' : '') + deltaCount + ' уд.</b> (' + b.count + ' против ' + a.count + ').');
 
       let items = [
-        { title: '⚡ Скорость маха и мощь', desc: speedText },
-        { title: '🎯 Подача и смэши', desc: serveText },
-        { title: '📊 Нагрузка и плотность', desc: volText }
+        { title: currentLang === 'en' ? '⚡ Swing Speed & Power' : '⚡ Скорость маха и мощь', desc: speedText },
+        { title: currentLang === 'en' ? '🌀 Spin & Impact Angle' : '🌀 Спин и угол атаки', desc: spinAngleText },
+        { title: currentLang === 'en' ? '🎯 Serve & Volume' : '🎯 Подача и объем', desc: serveText + ' ' + volText }
       ];
 
       items.forEach(it => {
@@ -2836,15 +4232,25 @@
       const ctx = document.getElementById('compareBarChart').getContext('2d');
       if (compareBarChart) compareBarChart.destroy();
 
+      const metricSel = document.getElementById('compareMetricSelect');
+      const metric = metricSel ? metricSel.value : 'swingSpeed';
+
+      const getVal = (obj) => {
+        if (!obj || obj.count === 0) return 0;
+        if (metric === 'swingSpeed') return +(obj.sumSwing / obj.count).toFixed(1);
+        if (metric === 'swingAngle') return +(obj.sumAngle / obj.count).toFixed(1);
+        if (metric === 'estSpin') return Math.round(obj.sumEstSpin / obj.count);
+        if (metric === 'wristRot') return +(obj.sumWristRot / obj.count).toFixed(1);
+        if (metric === 'wristElev') return +(obj.sumWristElev / obj.count).toFixed(1);
+        if (metric === 'variance') return +(obj.sumVar / obj.count).toFixed(2);
+        return 0;
+      };
+
       const allTypes = Array.from(new Set([...a.byType.keys(), ...b.byType.keys()])).sort();
-      const speedsA = allTypes.map(t => {
-        let obj = a.byType.get(t);
-        return obj ? +(obj.sumSwing / obj.count).toFixed(1) : 0;
-      });
-      const speedsB = allTypes.map(t => {
-        let obj = b.byType.get(t);
-        return obj ? +(obj.sumSwing / obj.count).toFixed(1) : 0;
-      });
+      const dataA = allTypes.map(tp => getVal(a.byType.get(tp)));
+      const dataB = allTypes.map(tp => getVal(b.byType.get(tp)));
+
+      const yLabel = metricSel && metricSel.selectedOptions[0] ? metricSel.selectedOptions[0].textContent : '';
 
       compareBarChart = new Chart(ctx, {
         type: 'bar',
@@ -2852,15 +4258,15 @@
           labels: allTypes,
           datasets: [
             {
-              label: 'А: ' + sessA.date,
-              data: speedsA,
+              label: 'A: ' + sessA.date,
+              data: dataA,
               backgroundColor: 'rgba(59, 130, 246, 0.75)',
               borderColor: '#3b82f6',
               borderWidth: 1
             },
             {
-              label: 'Б: ' + sessB.date,
-              data: speedsB,
+              label: 'B: ' + sessB.date,
+              data: dataB,
               backgroundColor: 'rgba(16, 185, 129, 0.75)',
               borderColor: '#10b981',
               borderWidth: 1
@@ -2872,7 +4278,56 @@
           maintainAspectRatio: false,
           scales: {
             x: { ticks: { color: '#8494ab', font: { size: 11 } }, grid: { display: false } },
-            y: { title: { display: true, text: 'Ср. скорость маха (км/ч)', color: '#8494ab' }, ticks: { color: '#8494ab' }, grid: { color: '#1f2d47' } }
+            y: { title: { display: true, text: yLabel, color: '#8494ab' }, ticks: { color: '#8494ab' }, grid: { color: '#1f2d47' } }
+          },
+          plugins: {
+            legend: { labels: { color: '#f1f5f9' } }
+          }
+        }
+      });
+    }
+
+    function renderCompareAngleSpinChart(a, b, sessA, sessB) {
+      const ctx = document.getElementById('compareAngleSpinChart').getContext('2d');
+      if (compareAngleSpinChart) compareAngleSpinChart.destroy();
+
+      const allTypes = Array.from(new Set([...a.byType.keys(), ...b.byType.keys()])).sort();
+      const angA = allTypes.map(tp => {
+        let o = a.byType.get(tp);
+        return o ? +(o.sumAngle / o.count).toFixed(1) : 0;
+      });
+      const angB = allTypes.map(tp => {
+        let o = b.byType.get(tp);
+        return o ? +(o.sumAngle / o.count).toFixed(1) : 0;
+      });
+
+      compareAngleSpinChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: allTypes,
+          datasets: [
+            {
+              label: 'A (°): ' + sessA.date,
+              data: angA,
+              backgroundColor: 'rgba(168, 85, 247, 0.7)',
+              borderColor: '#a855f7',
+              borderWidth: 1.5
+            },
+            {
+              label: 'B (°): ' + sessB.date,
+              data: angB,
+              backgroundColor: 'rgba(6, 182, 212, 0.7)',
+              borderColor: '#06b6d4',
+              borderWidth: 1.5
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { ticks: { color: '#8494ab', font: { size: 11 } }, grid: { display: false } },
+            y: { title: { display: true, text: t('colAvgAngle'), color: '#8494ab' }, ticks: { color: '#8494ab' }, grid: { color: '#1f2d47' } }
           },
           plugins: {
             legend: { labels: { color: '#f1f5f9' } }
@@ -2893,7 +4348,7 @@
         if (diff !== null && !isNaN(diff)) {
           let isUp = diff > 0;
           let isGood = isPositiveGood ? isUp : !isUp;
-          badgeClass = diff === 0 ? 'delta-neutral' : (isGood ? 'delta-up' : 'delta-down');
+          badgeClass = Math.abs(diff) < 0.05 ? 'delta-neutral' : (isGood ? 'delta-up' : 'delta-down');
           deltaText = (diff >= 0 ? '+' : '') + diff.toFixed(1) + ' ' + unit;
         }
 
@@ -2903,37 +4358,49 @@
           <td>${typeof valA === 'number' ? valA.toFixed(1) : valA} ${unit}</td>
           <td><b>${typeof valB === 'number' ? valB.toFixed(1) : valB} ${unit}</b></td>
           <td><span class="delta-badge ${badgeClass}">${deltaText}</span></td>
-          <td>${diff > 0 ? '▲ Рост' : diff < 0 ? '▼ Снижение' : 'Без изменений'}</td>
+          <td>${diff > 0.05 ? t('growth') : diff < -0.05 ? t('decline') : t('unchanged')}</td>
         `;
         tbody.appendChild(tr);
       }
 
-      addRow('Всего ударов за тренировку', statsA.count, statsB.count, 'уд.');
-      addRow('Средняя скорость маха', statsA.avgSwing, statsB.avgSwing, 'км/ч');
-      addRow('Расчетная скорость мяча', statsA.avgBall, statsB.avgBall, 'км/ч');
-      addRow('Максимальная скорость маха', statsA.maxSwing, statsB.maxSwing, 'км/ч');
-      addRow('Средняя скорость подачи', statsA.serveAvg, statsB.serveAvg, 'км/ч');
+      const kph = t('unitKph');
+      addRow(t('sessionTotalRow'), statsA.count, statsB.count, t('unitShots'));
+      addRow(t('sessionAvgSwingRow'), statsA.avgSwing, statsB.avgSwing, kph);
+      addRow(t('sessionAvgBallRow'), statsA.avgBall, statsB.avgBall, kph);
+      addRow(t('sessionMaxSwingRow'), statsA.maxSwing, statsB.maxSwing, kph);
+      addRow(t('sessionServeAvgRow'), statsA.serveAvg, statsB.serveAvg, kph);
+      addRow(t('sessionAvgAngleRow'), statsA.avgAngle, statsB.avgAngle, '°');
+      addRow(t('sessionFhTopAngleRow'), statsA.fhTopAngle, statsB.fhTopAngle, '°');
+      addRow(t('sessionEstSpinRow'), statsA.avgEstSpin, statsB.avgEstSpin, 'rpm');
+      addRow(t('sessionWristRotRow'), statsA.avgWristRot, statsB.avgWristRot, 'rpm');
+      addRow(t('sessionWristElevRow'), statsA.avgWristElev, statsB.avgWristElev, 'rpm');
+      addRow(t('sessionVarianceRow'), statsA.avgVar, statsB.avgVar, '', false);
 
       const allTypes = new Set([...statsA.byType.keys(), ...statsB.byType.keys()]);
-      Array.from(allTypes).sort().forEach(t => {
-        let aObj = statsA.byType.get(t);
-        let bObj = statsB.byType.get(t);
+      Array.from(allTypes).sort().forEach(tp => {
+        let aObj = statsA.byType.get(tp);
+        let bObj = statsB.byType.get(tp);
         let spdA = aObj ? (aObj.sumSwing / aObj.count) : 0;
         let spdB = bObj ? (bObj.sumSwing / bObj.count) : 0;
+        let angA = aObj ? (aObj.sumAngle / aObj.count) : 0;
+        let angB = bObj ? (bObj.sumAngle / bObj.count) : 0;
+        let spnA = aObj ? Math.round(aObj.sumEstSpin / aObj.count) : 0;
+        let spnB = bObj ? Math.round(bObj.sumEstSpin / bObj.count) : 0;
         let countA = aObj ? aObj.count : 0;
         let countB = bObj ? bObj.count : 0;
 
         let delta = spdB - spdA;
+        let dAng = angB - angA;
         let badgeClass = delta === 0 ? 'delta-neutral' : (delta > 0 ? 'delta-up' : 'delta-down');
         let icon = delta === 0 ? '•' : (delta > 0 ? '▲' : '▼');
 
         let tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><span class="pill ${getPillClass(t)}">${t}</span></td>
-          <td>${spdA > 0 ? `${spdA.toFixed(1)} км/ч <span style="color: var(--text-muted); font-size: 11px;">(${countA} уд.)</span>` : '-'}</td>
-          <td>${spdB > 0 ? `<b>${spdB.toFixed(1)} км/ч</b> <span style="color: var(--text-muted); font-size: 11px;">(${countB} уд.)</span>` : '-'}</td>
-          <td>${(spdA > 0 && spdB > 0) ? `<span class="delta-badge ${badgeClass}">${icon} ${delta >= 0 ? '+' : ''}${delta.toFixed(1)} км/ч</span>` : '-'}</td>
-          <td>${(spdA > 0 && spdB > 0) ? (delta > 0 ? 'Прирост силы' : delta < 0 ? 'Снижение скорости' : 'Без изменений') : 'Не выполнялся в одной из сессий'}</td>
+          <td><span class="pill ${getPillClass(tp)}">${tp}</span></td>
+          <td>${spdA > 0 ? `${spdA.toFixed(1)} ${kph} &bull; ${angA >= 0 ? '+' : ''}${angA.toFixed(1)}° &bull; ~${spnA} rpm <span style="color: var(--text-muted); font-size: 11px;">(${countA})</span>` : '-'}</td>
+          <td>${spdB > 0 ? `<b>${spdB.toFixed(1)} ${kph}</b> &bull; ${angB >= 0 ? '+' : ''}${angB.toFixed(1)}° &bull; ~${spnB} rpm <span style="color: var(--text-muted); font-size: 11px;">(${countB})</span>` : '-'}</td>
+          <td>${(spdA > 0 && spdB > 0) ? `<span class="delta-badge ${badgeClass}">${icon} ${delta >= 0 ? '+' : ''}${delta.toFixed(1)} ${kph} (${dAng >= 0 ? '+' : ''}${dAng.toFixed(1)}°)</span>` : '-'}</td>
+          <td>${(spdA > 0 && spdB > 0) ? (delta > 0 ? t('powerGain') : delta < 0 ? t('speedDrop') : t('unchanged')) : t('missingOneSess')}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -2953,6 +4420,8 @@
           shots: [],
           totalSwing: 0,
           totalBall: 0,
+          totalAngle: 0,
+          totalEstSpin: 0,
           maxSwing: 0,
           serves: [],
           fhTopspin: [],
@@ -2973,26 +4442,34 @@
 
           let plow = getPlowMultiplier(s.shotType, physicsMultiplier);
           let ball = s.swingSpeed * plow;
+          let ang = getSwingAngleDeg(s);
+          let sp = getEstBallSpin(s);
 
           st.shots.push(s);
           st.totalSwing += s.swingSpeed;
           st.totalBall += ball;
+          st.totalAngle += ang;
+          st.totalEstSpin += sp;
           if (s.swingSpeed > st.maxSwing) st.maxSwing = s.swingSpeed;
           st.varianceSum += s.variance;
           st.swingDurationSum += s.swingTime;
 
-          let t = s.shotType.toLowerCase();
-          if (t.includes('serve') || t.includes('smash')) st.serves.push(s);
-          if (t.includes('forehand topspin')) st.fhTopspin.push(s);
-          if (t.includes('backhand topspin')) st.bhTopspin.push(s);
-          if (t.includes('slice')) st.slices.push(s);
+          let tp = s.shotType.toLowerCase();
+          if (tp.includes('serve') || tp.includes('smash')) st.serves.push(s);
+          if (tp.includes('forehand topspin')) st.fhTopspin.push(s);
+          if (tp.includes('backhand topspin')) st.bhTopspin.push(s);
+          if (tp.includes('slice')) st.slices.push(s);
 
           if (!st.byShotType.has(s.shotType)) {
-            st.byShotType.set(s.shotType, { count: 0, sumSwing: 0 });
+            st.byShotType.set(s.shotType, { count: 0, sumSwing: 0, sumAngle: 0, sumEstSpin: 0, sumWristRot: 0, sumVar: 0 });
           }
           let sst = st.byShotType.get(s.shotType);
           sst.count++;
           sst.sumSwing += s.swingSpeed;
+          sst.sumAngle += ang;
+          sst.sumEstSpin += sp;
+          sst.sumWristRot += s.wristRot;
+          sst.sumVar += s.variance;
         });
       });
 
@@ -3010,14 +4487,14 @@
       container.innerHTML = '';
 
       if (activeRackets.length === 0) {
-        container.innerHTML = '<div style="color: var(--text-muted); font-size: 13px;">Нет данных по ракеткам. Назначьте ракетки этапам тренировок в Обзоре сессии.</div>';
+        container.innerHTML = '<div style="color: var(--text-muted); font-size: 13px;">' + t('noRacketData') + '</div>';
         return;
       }
 
       let bestPower = [...activeRackets].sort((a,b) => (b.totalSwing/b.shots.length) - (a.totalSwing/a.shots.length))[0];
       let spinScores = activeRackets.map(st => {
         let allTopspin = [...st.fhTopspin, ...st.bhTopspin];
-        let avgSpin = allTopspin.length > 0 ? (allTopspin.reduce((acc,s) => acc + s.wristRot, 0) / allTopspin.length) : 0;
+        let avgSpin = allTopspin.length > 0 ? (allTopspin.reduce((acc,s) => acc + getEstBallSpin(s), 0) / allTopspin.length) : (st.totalEstSpin / st.shots.length);
         return { st, avgSpin };
       }).sort((a,b) => b.avgSpin - a.avgSpin);
       let bestSpin = spinScores[0];
@@ -3029,23 +4506,32 @@
       let bestServe = serveScores[0];
 
       let bestControl = [...activeRackets].sort((a,b) => (a.varianceSum/a.shots.length) - (b.varianceSum/b.shots.length))[0];
+      const kph = t('unitKph');
 
       let verdicts = [
         {
-          title: '🚀 Максимальная мощь (Power)',
-          desc: bestPower ? ('Ракетка <b>' + bestPower.racket.name + '</b> выдает наивысшую среднюю скорость маха <b>' + (bestPower.totalSwing/bestPower.shots.length).toFixed(1) + ' км/ч</b> (мяч: ~' + (bestPower.totalBall/bestPower.shots.length).toFixed(1) + ' км/ч).') : '-'
+          title: currentLang === 'en' ? '🚀 Max Swing Power' : '🚀 Максимальная мощь (Power)',
+          desc: bestPower ? (currentLang === 'en'
+            ? ('<b>' + bestPower.racket.name + '</b> delivers highest avg swing speed <b>' + (bestPower.totalSwing/bestPower.shots.length).toFixed(1) + ' kph</b> (ball: ~' + (bestPower.totalBall/bestPower.shots.length).toFixed(1) + ' kph).')
+            : ('Ракетка <b>' + bestPower.racket.name + '</b> выдает наивысшую среднюю скорость маха <b>' + (bestPower.totalSwing/bestPower.shots.length).toFixed(1) + ' ' + kph + '</b> (мяч: ~' + (bestPower.totalBall/bestPower.shots.length).toFixed(1) + ' ' + kph + ').')) : '-'
         },
         {
-          title: '🌪️ Экстремальный спин (Spin Machine)',
-          desc: (bestSpin && bestSpin.avgSpin > 0) ? ('Ракетка <b>' + bestSpin.st.racket.name + '</b> генерирует максимум вращения кисти: <b>' + bestSpin.avgSpin.toFixed(0) + ' rpm</b>.') : 'Недостаточно данных по топспинам.'
+          title: currentLang === 'en' ? '🌪️ Spin & Whip Leader' : '🌪️ Экстремальный спин (Spin Machine)',
+          desc: (bestSpin && bestSpin.avgSpin > 0) ? (currentLang === 'en'
+            ? ('<b>' + bestSpin.st.racket.name + '</b> generates highest spin intensity: ~<b>' + Math.round(bestSpin.avgSpin) + ' rpm</b> (avg angle ' + ((bestSpin.st.totalAngle/bestSpin.st.shots.length) >= 0 ? '+' : '') + (bestSpin.st.totalAngle/bestSpin.st.shots.length).toFixed(1) + '°).')
+            : ('Ракетка <b>' + bestSpin.st.racket.name + '</b> генерирует максимум спина: ~<b>' + Math.round(bestSpin.avgSpin) + ' rpm</b> (ср. угол ' + ((bestSpin.st.totalAngle/bestSpin.st.shots.length) >= 0 ? '+' : '') + (bestSpin.st.totalAngle/bestSpin.st.shots.length).toFixed(1) + '°).')) : '-'
         },
         {
-          title: '⚡ Оружие подачи (Serve Weapon)',
-          desc: (bestServe && bestServe.avg > 0) ? ('<b>' + bestServe.st.racket.name + '</b> лидирует на подачах со средней скоростью <b>' + bestServe.avg.toFixed(1) + ' км/ч</b>.') : 'Подачи не зафиксированы.'
+          title: currentLang === 'en' ? '⚡ Serve Weapon' : '⚡ Оружие подачи (Serve Weapon)',
+          desc: (bestServe && bestServe.avg > 0) ? (currentLang === 'en'
+            ? ('<b>' + bestServe.st.racket.name + '</b> leads serves at <b>' + bestServe.avg.toFixed(1) + ' kph</b> avg.')
+            : ('<b>' + bestServe.st.racket.name + '</b> лидирует на подачах со средней скоростью <b>' + bestServe.avg.toFixed(1) + ' ' + kph + '</b>.')) : t('kpiNoServes')
         },
         {
-          title: '🎯 Стабильность и контроль (Feel & Control)',
-          desc: bestControl ? ('Ракетка <b>' + bestControl.racket.name + '</b> имеет наименьший разброс ударов (дисперсия: ' + (bestControl.varianceSum/bestControl.shots.length).toFixed(1) + ').') : '-'
+          title: currentLang === 'en' ? '🎯 Control & Consistency' : '🎯 Стабильность и контроль (Feel & Control)',
+          desc: bestControl ? (currentLang === 'en'
+            ? ('<b>' + bestControl.racket.name + '</b> shows lowest swing variance (<b>' + (bestControl.varianceSum/bestControl.shots.length).toFixed(2) + '</b>).')
+            : ('Ракетка <b>' + bestControl.racket.name + '</b> имеет наименьший разброс ударов (дисперсия: <b>' + (bestControl.varianceSum/bestControl.shots.length).toFixed(2) + '</b>).')) : '-'
         }
       ];
 
@@ -3060,13 +4546,15 @@
     function renderRacketsKpiCards(activeRackets) {
       const container = document.getElementById('racketsKpiGrid');
       container.innerHTML = '';
+      const kph = t('unitKph');
 
       activeRackets.forEach(st => {
         let count = st.shots.length;
         let avgSwing = st.totalSwing / count;
         let avgBall = st.totalBall / count;
+        let avgAng = st.totalAngle / count;
+        let avgEstSpin = st.totalEstSpin / count;
         let serveAvg = st.serves.length > 0 ? (st.serves.reduce((acc,s) => acc + s.swingSpeed, 0) / st.serves.length) : 0;
-        let fhSpin = st.fhTopspin.length > 0 ? (st.fhTopspin.reduce((acc,s) => acc + s.wristRot, 0) / st.fhTopspin.length) : 0;
 
         let card = document.createElement('div');
         card.className = 'kpi-card';
@@ -3074,12 +4562,12 @@
         card.innerHTML = `
           <div class="kpi-title" style="color: ${st.racket.color}; display: flex; justify-content: space-between;">
             <span>${st.racket.name}</span>
-            <span>${count} уд.</span>
+            <span>${count} ${t('unitShots')}</span>
           </div>
-          <div class="kpi-main-val">${avgSwing.toFixed(1)} <span class="kpi-unit">км/ч</span></div>
-          <div class="kpi-ball-val">⚡ Мяч: ~${avgBall.toFixed(1)} км/ч</div>
+          <div class="kpi-main-val">${avgSwing.toFixed(1)} <span class="kpi-unit">${kph}</span></div>
+          <div class="kpi-ball-val">${t('kpiBallEstPrefix')}${avgBall.toFixed(1)} ${kph}</div>
           <div class="kpi-sub">
-            Подача: ${serveAvg > 0 ? `${serveAvg.toFixed(1)} км/ч` : '-'} &bull; FH Спин: ${fhSpin > 0 ? `${fhSpin.toFixed(0)} rpm` : '-'}
+            ${t('colAvgServe')}: ${serveAvg > 0 ? `${serveAvg.toFixed(1)} ${kph}` : '-'} &bull; ${t('colAvgAngle')}: ${avgAng >= 0 ? '+' : ''}${avgAng.toFixed(1)}° &bull; ~${Math.round(avgEstSpin)} rpm
           </div>
           <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">${st.racket.specs || ''}</div>
         `;
@@ -3091,6 +4579,9 @@
       const ctx = document.getElementById('racketsSpeedChart').getContext('2d');
       if (racketsSpeedChart) racketsSpeedChart.destroy();
 
+      const metricSel = document.getElementById('racketsMetricSelect');
+      const metric = metricSel ? metricSel.value : 'swingSpeed';
+
       const mainShotTypes = [
         'Forehand flat',
         'Forehand topspin',
@@ -3100,12 +4591,18 @@
         'Backhand slice'
       ];
 
-      const datasets = activeRackets.map(st => {
-        let data = mainShotTypes.map(t => {
-          let obj = st.byShotType.get(t);
-          return obj ? +(obj.sumSwing / obj.count).toFixed(1) : 0;
-        });
+      const getVal = (obj) => {
+        if (!obj || obj.count === 0) return 0;
+        if (metric === 'swingSpeed') return +(obj.sumSwing / obj.count).toFixed(1);
+        if (metric === 'swingAngle') return +(obj.sumAngle / obj.count).toFixed(1);
+        if (metric === 'estSpin') return Math.round(obj.sumEstSpin / obj.count);
+        if (metric === 'wristRot') return +(obj.sumWristRot / obj.count).toFixed(1);
+        if (metric === 'variance') return +(obj.sumVar / obj.count).toFixed(2);
+        return 0;
+      };
 
+      const datasets = activeRackets.map(st => {
+        let data = mainShotTypes.map(tp => getVal(st.byShotType.get(tp)));
         return {
           label: st.racket.name,
           data: data,
@@ -3114,6 +4611,8 @@
           borderWidth: 1.5
         };
       });
+
+      const yLabel = metricSel && metricSel.selectedOptions[0] ? metricSel.selectedOptions[0].textContent : '';
 
       racketsSpeedChart = new Chart(ctx, {
         type: 'bar',
@@ -3126,7 +4625,7 @@
           maintainAspectRatio: false,
           scales: {
             x: { ticks: { color: '#8494ab', font: { size: 11 } }, grid: { display: false } },
-            y: { title: { display: true, text: 'Ср. скорость маха (км/ч)', color: '#8494ab' }, ticks: { color: '#8494ab' }, grid: { color: '#1f2d47' } }
+            y: { title: { display: true, text: yLabel, color: '#8494ab' }, ticks: { color: '#8494ab' }, grid: { color: '#1f2d47' } }
           },
           plugins: {
             legend: { labels: { color: '#f1f5f9' } }
@@ -3142,31 +4641,30 @@
       if (activeRackets.length === 0) return;
 
       const maxSwing = Math.max(...activeRackets.map(st => st.totalSwing / st.shots.length), 1);
-      const maxSpin = Math.max(...activeRackets.map(st => {
-        let top = [...st.fhTopspin, ...st.bhTopspin];
-        return top.length > 0 ? (top.reduce((acc,s) => acc + Math.abs(s.wristRot), 0)/top.length) : 0;
-      }), 1);
+      const maxSpin = Math.max(...activeRackets.map(st => st.totalEstSpin / st.shots.length), 1);
       const maxServe = Math.max(...activeRackets.map(st => {
         return st.serves.length > 0 ? (st.serves.reduce((acc,s) => acc + s.swingSpeed, 0)/st.serves.length) : 0;
       }), 1);
-      const maxShots = Math.max(...activeRackets.map(st => st.shots.length), 1);
+      const maxFhAng = Math.max(...activeRackets.map(st => {
+        return st.fhTopspin.length > 0 ? Math.abs(st.fhTopspin.reduce((acc,s) => acc + getSwingAngleDeg(s), 0) / st.fhTopspin.length) : 15;
+      }), 1);
 
       const datasets = activeRackets.map(st => {
         let avgSw = st.totalSwing / st.shots.length;
-        let top = [...st.fhTopspin, ...st.bhTopspin];
-        let avgSp = top.length > 0 ? (top.reduce((acc,s) => acc + Math.abs(s.wristRot), 0)/top.length) : 0;
+        let avgSp = st.totalEstSpin / st.shots.length;
         let avgSrv = st.serves.length > 0 ? (st.serves.reduce((acc,s) => acc + s.swingSpeed, 0)/st.serves.length) : 0;
         let varAvg = st.varianceSum / st.shots.length;
         let controlScore = Math.max(10, 100 - (varAvg * 10));
+        let fhAng = st.fhTopspin.length > 0 ? Math.abs(st.fhTopspin.reduce((acc,s) => acc + getSwingAngleDeg(s), 0) / st.fhTopspin.length) : 15;
 
         let powerNorm = Math.round((avgSw / maxSwing) * 100);
         let spinNorm = maxSpin > 0 ? Math.round((avgSp / maxSpin) * 100) : 50;
         let serveNorm = maxServe > 0 ? Math.round((avgSrv / maxServe) * 100) : 50;
-        let volNorm = Math.round((st.shots.length / maxShots) * 100);
+        let angNorm = Math.min(100, Math.round((fhAng / maxFhAng) * 100));
 
         return {
           label: st.racket.name,
-          data: [powerNorm, spinNorm, serveNorm, Math.round(controlScore), volNorm],
+          data: [powerNorm, spinNorm, serveNorm, Math.round(controlScore), angNorm],
           backgroundColor: st.racket.color + '26',
           borderColor: st.racket.color,
           pointBackgroundColor: st.racket.color,
@@ -3177,7 +4675,7 @@
       racketsProfileChart = new Chart(ctx, {
         type: 'radar',
         data: {
-          labels: ['Мощь маха', 'Топспин (Spin)', 'Подача', 'Контроль', 'Объем ударов'],
+          labels: t('radarLabels'),
           datasets: datasets
         },
         options: {
@@ -3201,16 +4699,19 @@
     function renderRacketsTable(activeRackets) {
       const tbody = document.getElementById('racketsTableBody');
       tbody.innerHTML = '';
+      const kph = t('unitKph');
 
       activeRackets.forEach(st => {
         let count = st.shots.length;
         let avgSwing = st.totalSwing / count;
         let avgBall = st.totalBall / count;
+        let avgAng = st.totalAngle / count;
+        let avgEstSpin = st.totalEstSpin / count;
         let serveAvg = st.serves.length > 0 ? (st.serves.reduce((acc,s) => acc + s.swingSpeed, 0) / st.serves.length) : 0;
         let fhTopAvgSpd = st.fhTopspin.length > 0 ? (st.fhTopspin.reduce((acc,s) => acc + s.swingSpeed, 0) / st.fhTopspin.length) : 0;
-        let fhTopAvgSpin = st.fhTopspin.length > 0 ? (st.fhTopspin.reduce((acc,s) => acc + s.wristRot, 0) / st.fhTopspin.length) : 0;
-        let avgSpinAll = st.shots.reduce((acc,s) => acc + s.wristRot, 0) / count;
-        let avgDur = st.swingDurationSum / count;
+        let fhTopAvgAng = st.fhTopspin.length > 0 ? (st.fhTopspin.reduce((acc,s) => acc + getSwingAngleDeg(s), 0) / st.fhTopspin.length) : 0;
+        let avgVar = st.varianceSum / count;
+        let traj = getSwingTrajectoryInfo(avgAng);
 
         let tr = document.createElement('tr');
         tr.innerHTML = `
@@ -3222,13 +4723,13 @@
           </td>
           <td style="color: var(--text-muted); font-size: 12px;">${st.racket.specs || '-'}</td>
           <td><b>${count}</b></td>
-          <td><b style="color: #fff;">${avgSwing.toFixed(1)}</b></td>
+          <td><b style="color: #fff;">${avgSwing.toFixed(1)}</b> <span style="font-size:11px;color:var(--text-muted);">${kph}</span></td>
           <td><b style="color: var(--accent);">~${avgBall.toFixed(1)}</b></td>
-          <td style="color: #f59e0b;">${st.maxSwing.toFixed(1)}</td>
-          <td style="color: ${avgSpinAll >= 0 ? '#34d399' : '#f87171'};">${avgSpinAll.toFixed(0)}</td>
-          <td>${serveAvg > 0 ? `${serveAvg.toFixed(1)} км/ч` : '-'}</td>
-          <td>${fhTopAvgSpd > 0 ? `${fhTopAvgSpd.toFixed(1)} км/ч (${fhTopAvgSpin.toFixed(0)} rpm)` : '-'}</td>
-          <td>${avgDur.toFixed(0)}</td>
+          <td><span class="angle-badge ${traj.cls}">${traj.arrow} ${avgAng >= 0 ? '+' : ''}${avgAng.toFixed(1)}°</span></td>
+          <td style="color: #c084fc; font-weight: 600;">~${Math.round(avgEstSpin)}</td>
+          <td>${serveAvg > 0 ? `${serveAvg.toFixed(1)} ${kph}` : '-'}</td>
+          <td>${fhTopAvgSpd > 0 ? `${fhTopAvgSpd.toFixed(1)} ${kph} (+${fhTopAvgAng.toFixed(1)}°)` : '-'}</td>
+          <td>${avgVar.toFixed(2)}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -3260,14 +4761,7 @@
         }
 
         if (dynamicsShotFilterType !== 'all') {
-          shots = shots.filter(s => {
-            let t = s.shotType.toLowerCase();
-            if (dynamicsShotFilterType === 'serve') return t.includes('serve') || t.includes('smash');
-            if (dynamicsShotFilterType === 'fh_topspin') return t.includes('forehand topspin');
-            if (dynamicsShotFilterType === 'bh_topspin') return t.includes('backhand topspin');
-            if (dynamicsShotFilterType === 'slice') return t.includes('slice');
-            return true;
-          });
+          shots = shots.filter(s => matchesShotFilter(s.shotType, dynamicsShotFilterType));
         }
 
         if (shots.length === 0) return;
@@ -3277,6 +4771,8 @@
         let maxSw = Math.max(...shots.map(s => s.swingSpeed));
         let avgSw = totalSwing / shots.length;
         let avgBl = totalBall / shots.length;
+        let avgAng = shots.reduce((acc, s) => acc + getSwingAngleDeg(s), 0) / shots.length;
+        let avgVar = shots.reduce((acc, s) => acc + s.variance, 0) / shots.length;
 
         let serves = shots.filter(s => s.shotType.toLowerCase().includes('serve') || s.shotType.toLowerCase().includes('smash'));
         let serveAvg = serves.length > 0 ? (serves.reduce((acc, s) => acc + s.swingSpeed, 0) / serves.length) : 0;
@@ -3284,6 +4780,7 @@
         let fhTops = shots.filter(s => s.shotType.toLowerCase().includes('forehand topspin'));
         let fhTopAvgSpd = fhTops.length > 0 ? (fhTops.reduce((acc, s) => acc + s.swingSpeed, 0) / fhTops.length) : 0;
         let fhTopAvgSpin = fhTops.length > 0 ? (fhTops.reduce((acc, s) => acc + s.wristRot, 0) / fhTops.length) : 0;
+        let fhTopAvgAng = fhTops.length > 0 ? (fhTops.reduce((acc, s) => acc + getSwingAngleDeg(s), 0) / fhTops.length) : 0;
 
         let usedRacketIds = new Set();
         shots.forEach(s => {
@@ -3306,17 +4803,21 @@
           avgSwing: avgSw,
           avgBall: avgBl,
           maxSwing: maxSw,
+          avgAngle: avgAng,
+          avgVariance: avgVar,
           serveAvg: serveAvg,
           fhTopAvgSpd: fhTopAvgSpd,
           fhTopAvgSpin: fhTopAvgSpin,
+          fhTopAvgAng: fhTopAvgAng,
           usedRackets: Array.from(usedRacketIds).map(id => getRacketById(id)).filter(Boolean)
         });
       });
 
+      const kph = t('unitKph');
       document.getElementById('dynKpiDaysCount').textContent = dayData.length;
       document.getElementById('dynKpiDateRange').textContent = dayData.length > 0 ? (dayData[0].date + ' ... ' + dayData[dayData.length-1].date) : '-';
       document.getElementById('dynKpiTotalShots').textContent = totalShotsCount;
-      document.getElementById('dynKpiAvgShotsPerDay').textContent = dayData.length > 0 ? ('Ср: ~' + Math.round(totalShotsCount/dayData.length) + ' уд/день') : '-';
+      document.getElementById('dynKpiAvgShotsPerDay').textContent = dayData.length > 0 ? ((currentLang === 'en' ? 'Avg: ~' : 'Ср: ~') + Math.round(totalShotsCount/dayData.length) + ' ' + t('unitShotsPerDay')) : '-';
 
       if (dayData.length >= 2) {
         let first = dayData[0];
@@ -3325,22 +4826,23 @@
         let dBall = last.avgBall - first.avgBall;
         let dServe = (first.serveAvg > 0 && last.serveAvg > 0) ? (last.serveAvg - first.serveAvg) : 0;
 
-        document.getElementById('dynKpiSwingDelta').innerHTML = (dSwing >= 0 ? '+' : '') + dSwing.toFixed(1) + ' <span class="kpi-unit">км/ч ' + (dSwing >= 0 ? '▲' : '▼') + '</span>';
-        document.getElementById('dynKpiBallDelta').textContent = 'Мяч: ' + (dBall >= 0 ? '+' : '') + dBall.toFixed(1) + ' км/ч';
-        document.getElementById('dynKpiServeDelta').innerHTML = (dServe >= 0 ? '+' : '') + dServe.toFixed(1) + ' <span class="kpi-unit">км/ч ' + (dServe >= 0 ? '▲' : '▼') + '</span>';
-        document.getElementById('dynKpiServeAvg').textContent = 'С ' + first.serveAvg.toFixed(1) + ' до ' + last.serveAvg.toFixed(1) + ' км/ч';
+        document.getElementById('dynKpiSwingDelta').innerHTML = (dSwing >= 0 ? '+' : '') + dSwing.toFixed(1) + ' <span class="kpi-unit">' + kph + ' ' + (dSwing >= 0 ? '▲' : '▼') + '</span>';
+        document.getElementById('dynKpiBallDelta').textContent = (currentLang === 'en' ? 'Ball: ' : 'Мяч: ') + (dBall >= 0 ? '+' : '') + dBall.toFixed(1) + ' ' + kph;
+        document.getElementById('dynKpiServeDelta').innerHTML = (dServe >= 0 ? '+' : '') + dServe.toFixed(1) + ' <span class="kpi-unit">' + kph + ' ' + (dServe >= 0 ? '▲' : '▼') + '</span>';
+        document.getElementById('dynKpiServeAvg').textContent = first.serveAvg.toFixed(1) + ' → ' + last.serveAvg.toFixed(1) + ' ' + kph;
       } else {
-        document.getElementById('dynKpiSwingDelta').innerHTML = '0 <span class="kpi-unit">км/ч</span>';
-        document.getElementById('dynKpiBallDelta').textContent = 'Мяч: 0 км/ч';
-        document.getElementById('dynKpiServeDelta').innerHTML = '0 <span class="kpi-unit">км/ч</span>';
+        document.getElementById('dynKpiSwingDelta').innerHTML = '0 <span class="kpi-unit">' + kph + '</span>';
+        document.getElementById('dynKpiBallDelta').textContent = (currentLang === 'en' ? 'Ball: 0 kph' : 'Мяч: 0 км/ч');
+        document.getElementById('dynKpiServeDelta').innerHTML = '0 <span class="kpi-unit">' + kph + '</span>';
         document.getElementById('dynKpiServeAvg').textContent = '-';
       }
 
-      document.getElementById('dynKpiRecordSpeed').innerHTML = recordSpeed.toFixed(1) + ' <span class="kpi-unit">км/ч</span>';
+      document.getElementById('dynKpiRecordSpeed').innerHTML = recordSpeed.toFixed(1) + ' <span class="kpi-unit">' + kph + '</span>';
       document.getElementById('dynKpiRecordDetail').textContent = recordDetail;
 
       renderDynamicsSpeedChart(dayData);
       renderDynamicsServeSpinChart(dayData);
+      renderDynamicsAngleVarChart(dayData);
       renderDynamicsTable(dayData);
     }
 
@@ -3354,7 +4856,7 @@
         chip.className = 'session-chip' + (isChecked ? ' selected' : '');
         chip.innerHTML = `
           <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleDynamicsSession('${s.id}', this.checked)">
-          <span>📅 ${s.date} (${s.shots.length} уд.)</span>
+          <span>📅 ${s.date} (${s.shots.length} ${t('unitShots')})</span>
         `;
         container.appendChild(chip);
       });
@@ -3382,6 +4884,7 @@
       const avgSwings = dayData.map(d => +d.avgSwing.toFixed(1));
       const avgBalls = dayData.map(d => +d.avgBall.toFixed(1));
       const maxSwings = dayData.map(d => +d.maxSwing.toFixed(1));
+      const kph = t('unitKph');
 
       dynamicsSpeedChart = new Chart(ctx, {
         type: 'line',
@@ -3389,7 +4892,7 @@
           labels: labels,
           datasets: [
             {
-              label: 'Ср. скорость маха (км/ч)',
+              label: t('colAvgSwing') + ' (' + kph + ')',
               data: avgSwings,
               borderColor: '#10b981',
               backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -3399,7 +4902,7 @@
               fill: true
             },
             {
-              label: 'Расчетная скорость мяча (км/ч)',
+              label: t('colAvgBall') + ' (' + kph + ')',
               data: avgBalls,
               borderColor: '#3b82f6',
               borderDash: [4, 4],
@@ -3409,7 +4912,7 @@
               tension: 0.25
             },
             {
-              label: 'Пиковая скорость дня (км/ч)',
+              label: t('colMaxSwing') + ' (' + kph + ')',
               data: maxSwings,
               borderColor: '#f59e0b',
               backgroundColor: 'transparent',
@@ -3425,7 +4928,7 @@
           maintainAspectRatio: false,
           scales: {
             x: { ticks: { color: '#8494ab' }, grid: { display: false } },
-            y: { title: { display: true, text: 'Скорость (км/ч)', color: '#8494ab' }, ticks: { color: '#8494ab' }, grid: { color: '#1f2d47' } }
+            y: { title: { display: true, text: kph, color: '#8494ab' }, ticks: { color: '#8494ab' }, grid: { color: '#1f2d47' } }
           },
           plugins: {
             legend: { labels: { color: '#f1f5f9' } }
@@ -3441,6 +4944,7 @@
       const labels = dayData.map(d => d.date);
       const serveSpeeds = dayData.map(d => +d.serveAvg.toFixed(1));
       const spins = dayData.map(d => +d.fhTopAvgSpin.toFixed(0));
+      const kph = t('unitKph');
 
       dynamicsServeSpinChart = new Chart(ctx, {
         type: 'line',
@@ -3448,7 +4952,7 @@
           labels: labels,
           datasets: [
             {
-              label: 'Ср. скорость подачи (км/ч)',
+              label: t('colAvgServe') + ' (' + kph + ')',
               data: serveSpeeds,
               borderColor: '#f59e0b',
               backgroundColor: 'rgba(245, 158, 11, 0.15)',
@@ -3458,7 +4962,7 @@
               tension: 0.25
             },
             {
-              label: 'Вращение кисти FH Топспин (rpm)',
+              label: 'FH Topspin ' + t('colWristRot'),
               data: spins,
               borderColor: '#06b6d4',
               backgroundColor: 'rgba(6, 182, 212, 0.15)',
@@ -3477,15 +4981,89 @@
             ySpeed: {
               type: 'linear',
               position: 'left',
-              title: { display: true, text: 'Скорость подачи (км/ч)', color: '#f59e0b' },
+              title: { display: true, text: t('colAvgServe') + ' (' + kph + ')', color: '#f59e0b' },
               ticks: { color: '#f59e0b' },
               grid: { color: '#1f2d47' }
             },
             ySpin: {
               type: 'linear',
               position: 'right',
-              title: { display: true, text: 'Вращение кисти (rpm)', color: '#06b6d4' },
+              title: { display: true, text: t('colWristRot'), color: '#06b6d4' },
               ticks: { color: '#06b6d4' },
+              grid: { drawOnChartArea: false }
+            }
+          },
+          plugins: {
+            legend: { labels: { color: '#f1f5f9' } }
+          }
+        }
+      });
+    }
+
+    function renderDynamicsAngleVarChart(dayData) {
+      const ctx = document.getElementById('dynamicsAngleVarChart').getContext('2d');
+      if (dynamicsAngleVarChart) dynamicsAngleVarChart.destroy();
+
+      const labels = dayData.map(d => d.date);
+      const avgAngles = dayData.map(d => +d.avgAngle.toFixed(1));
+      const fhAngles = dayData.map(d => +d.fhTopAvgAng.toFixed(1));
+      const variances = dayData.map(d => +d.avgVariance.toFixed(2));
+
+      dynamicsAngleVarChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: t('colAvgAngle'),
+              data: avgAngles,
+              borderColor: '#3b82f6',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              pointBackgroundColor: '#3b82f6',
+              pointRadius: 5,
+              yAxisID: 'yAngle',
+              tension: 0.25
+            },
+            {
+              label: 'FH Topspin Angle (°)',
+              data: fhAngles,
+              borderColor: '#a855f7',
+              backgroundColor: 'transparent',
+              pointBackgroundColor: '#a855f7',
+              pointRadius: 5,
+              yAxisID: 'yAngle',
+              tension: 0.25
+            },
+            {
+              label: t('colVariance'),
+              data: variances,
+              borderColor: '#ef4444',
+              borderDash: [4, 4],
+              backgroundColor: 'transparent',
+              pointBackgroundColor: '#ef4444',
+              pointRadius: 4,
+              yAxisID: 'yVar',
+              tension: 0.25
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { ticks: { color: '#8494ab' }, grid: { display: false } },
+            yAngle: {
+              type: 'linear',
+              position: 'left',
+              title: { display: true, text: t('colAvgAngle'), color: '#60a5fa' },
+              ticks: { color: '#60a5fa' },
+              grid: { color: '#1f2d47' }
+            },
+            yVar: {
+              type: 'linear',
+              position: 'right',
+              title: { display: true, text: t('colVariance'), color: '#f87171' },
+              ticks: { color: '#f87171' },
               grid: { drawOnChartArea: false }
             }
           },
@@ -3499,31 +5077,36 @@
     function renderDynamicsTable(dayData) {
       const tbody = document.getElementById('dynamicsTableBody');
       tbody.innerHTML = '';
+      const kph = t('unitKph');
 
       dayData.forEach((row, idx) => {
         let prev = idx > 0 ? dayData[idx - 1] : null;
-        let deltaHtml = '<span class="delta-badge delta-neutral">Базовый день</span>';
+        let deltaHtml = '<span class="delta-badge delta-neutral">' + t('baseDay') + '</span>';
 
         if (prev) {
           let diff = row.avgSwing - prev.avgSwing;
           let badgeClass = diff === 0 ? 'delta-neutral' : (diff > 0 ? 'delta-up' : 'delta-down');
           let icon = diff === 0 ? '•' : (diff > 0 ? '▲' : '▼');
-          deltaHtml = '<span class="delta-badge ' + badgeClass + '">' + icon + ' ' + (diff >= 0 ? '+' : '') + diff.toFixed(1) + ' км/ч</span>';
+          deltaHtml = '<span class="delta-badge ' + badgeClass + '">' + icon + ' ' + (diff >= 0 ? '+' : '') + diff.toFixed(1) + ' ' + kph + '</span>';
         }
 
         let racketBadges = row.usedRackets.map(r => {
           return '<span class="racket-badge" style="border-color:' + r.color + '; color:' + r.color + '; margin-right:4px;"><span class="racket-dot" style="background-color:' + r.color + ';"></span>' + r.name + '</span>';
         }).join('');
 
+        let traj = getSwingTrajectoryInfo(row.avgAngle);
+
         let tr = document.createElement('tr');
         tr.innerHTML = `
           <td><b>${row.date}</b></td>
           <td style="color: var(--text-muted);">${row.name}</td>
           <td><b>${row.count}</b></td>
-          <td><b style="color: #fff;">${row.avgSwing.toFixed(1)}</b></td>
+          <td><b style="color: #fff;">${row.avgSwing.toFixed(1)}</b> <span style="font-size:11px;color:var(--text-muted);">${kph}</span></td>
           <td><b style="color: var(--accent);">~${row.avgBall.toFixed(1)}</b></td>
-          <td>${row.serveAvg > 0 ? `${row.serveAvg.toFixed(1)} км/ч` : '-'}</td>
-          <td>${row.fhTopAvgSpd > 0 ? `${row.fhTopAvgSpd.toFixed(1)} км/ч (${row.fhTopAvgSpin.toFixed(0)} rpm)` : '-'}</td>
+          <td><span class="angle-badge ${traj.cls}">${traj.arrow} ${row.avgAngle >= 0 ? '+' : ''}${row.avgAngle.toFixed(1)}°</span></td>
+          <td>${row.serveAvg > 0 ? `${row.serveAvg.toFixed(1)} ${kph}` : '-'}</td>
+          <td>${row.fhTopAvgSpd > 0 ? `${row.fhTopAvgSpd.toFixed(1)} ${kph} (+${row.fhTopAvgAng.toFixed(1)}° | ${row.fhTopAvgSpin.toFixed(0)} rpm)` : '-'}</td>
+          <td>${row.avgVariance.toFixed(2)}</td>
           <td>${racketBadges || '<span style="color: var(--text-muted);">-</span>'}</td>
           <td>${deltaHtml}</td>
         `;
@@ -3532,25 +5115,25 @@
     }
 
     function getShotColor(shotType) {
-      let t = (shotType || '').toLowerCase();
-      if (t.includes('serve') || t.includes('smash')) return '#f59e0b';
-      if (t.includes('forehand topspin')) return '#3b82f6';
-      if (t.includes('forehand flat')) return '#60a5fa';
-      if (t.includes('forehand slice')) return '#06b6d4';
-      if (t.includes('backhand topspin')) return '#8b5cf6';
-      if (t.includes('backhand flat')) return '#a855f7';
-      if (t.includes('backhand slice')) return '#06b6d4';
-      if (t.includes('volley') || t.includes('block')) return '#ec4899';
+      let tp = (shotType || '').toLowerCase();
+      if (tp.includes('serve') || tp.includes('smash')) return '#f59e0b';
+      if (tp.includes('forehand topspin')) return '#3b82f6';
+      if (tp.includes('forehand flat')) return '#60a5fa';
+      if (tp.includes('forehand slice')) return '#06b6d4';
+      if (tp.includes('backhand topspin')) return '#8b5cf6';
+      if (tp.includes('backhand flat')) return '#a855f7';
+      if (tp.includes('backhand slice')) return '#06b6d4';
+      if (tp.includes('volley') || tp.includes('block')) return '#ec4899';
       return '#10b981';
     }
 
     function getPillClass(shotType) {
-      let t = (shotType || '').toLowerCase();
-      if (t.includes('serve') || t.includes('smash')) return 'pill-serve';
-      if (t.includes('slice')) return 'pill-slice';
-      if (t.includes('forehand')) return 'pill-forehand';
-      if (t.includes('backhand')) return 'pill-backhand';
-      if (t.includes('volley')) return 'pill-volley';
+      let tp = (shotType || '').toLowerCase();
+      if (tp.includes('serve') || tp.includes('smash')) return 'pill-serve';
+      if (tp.includes('slice')) return 'pill-slice';
+      if (tp.includes('forehand')) return 'pill-forehand';
+      if (tp.includes('backhand')) return 'pill-backhand';
+      if (tp.includes('volley')) return 'pill-volley';
       return 'pill-other';
     }
 
@@ -3600,9 +5183,9 @@
           }
           populateSelects();
           renderCurrentView();
-          alert('Резервная копия успешно восстановлена!');
+          alert(t('backupRestored'));
         } catch(err) {
-          alert('Ошибка чтения файла резервной копии: ' + err.message);
+          alert(t('backupErr') + err.message);
         }
       };
       reader.readAsText(file);
@@ -3610,7 +5193,7 @@
     }
 
     function clearAllData() {
-      if (confirm('Вы уверены, что хотите полностью очистить все загруженные тренировки?')) {
+      if (confirm(t('confirmClear'))) {
         sessions = [];
         localStorage.removeItem('tennis_dashboard_sessions_v3');
         populateSelects();
