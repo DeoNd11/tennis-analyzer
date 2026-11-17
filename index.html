@@ -861,6 +861,69 @@
     .angle-flat { background: rgba(59, 130, 246, 0.16); color: #60a5fa; }
     .angle-down { background: rgba(245, 158, 11, 0.16); color: #fbbf24; }
 
+    /* 2D Heatmaps */
+    .heatmap-wrap {
+      overflow-x: auto;
+    }
+    .heatmap-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 4px;
+      font-size: 12px;
+    }
+    .heatmap-table th {
+      background: transparent;
+      border-bottom: none;
+      color: var(--text-muted);
+      font-size: 11px;
+      padding: 6px 8px;
+      text-align: center;
+      cursor: default;
+    }
+    .heatmap-table th.hm-row-hdr {
+      text-align: left;
+      white-space: nowrap;
+      color: #cbd5e1;
+      font-weight: 700;
+    }
+    .heatmap-cell {
+      border-radius: 6px;
+      padding: 10px 6px;
+      text-align: center;
+      font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.06);
+      transition: transform 0.15s ease, border-color 0.15s ease;
+      min-width: 72px;
+    }
+    .heatmap-cell:hover {
+      transform: scale(1.04);
+      border-color: #fff;
+      z-index: 2;
+      position: relative;
+    }
+    .hm-sub {
+      display: block;
+      font-size: 10px;
+      font-weight: 500;
+      opacity: 0.85;
+      margin-top: 2px;
+    }
+    .heatmap-legend {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 10px;
+      justify-content: flex-end;
+    }
+    .heatmap-scale-bar {
+      width: 120px;
+      height: 8px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, rgba(30,41,59,0.7), rgba(16,185,129,0.55), rgba(245,158,11,0.75), rgba(239,68,68,0.85));
+    }
+
     .hidden { display: none !important; }
   </style>
 </head>
@@ -939,6 +1002,9 @@
       <button class="nav-tab" id="tabSpin" onclick="switchViewMode('spin')">
         <span class="tab-icon">🌀</span> <span data-i18n="tabSpin">Спин и угол удара</span>
       </button>
+      <button class="nav-tab" id="tabStability" onclick="switchViewMode('stability')">
+        <span class="tab-icon">🔥</span> <span data-i18n="tabStability">Усталость, темп и карты</span>
+      </button>
       <button class="nav-tab" id="tabCompare" onclick="switchViewMode('compare')">
         <span class="tab-icon">⚖️</span> <span data-i18n="tabCompare">Сравнение 2-х сессий</span>
       </button>
@@ -981,6 +1047,34 @@
           <option value="serve" data-i18n="optServe">Подача / Смэш</option>
           <option value="slice" data-i18n="optSlice">Слайсы / Резаные</option>
           <option value="volley" data-i18n="optVolley">Удар с лета / Блок</option>
+        </select>
+      </div>
+
+      <!-- Stability, Fatigue & Heatmaps Selectors -->
+      <div class="select-group hidden" id="stabilitySelectorGroup">
+        <span class="select-label" data-i18n="lblSession">Сессия:</span>
+        <select id="stabSessionFilter">
+          <option value="all" data-i18n="optAllSessions">Все тренировки</option>
+        </select>
+        <span class="select-label" style="margin-left: 6px;" data-i18n="lblRacket">Ракетка:</span>
+        <select id="stabRacketFilter">
+          <option value="all" data-i18n="optAllRackets">Все ракетки</option>
+        </select>
+        <span class="select-label" style="margin-left: 6px;" data-i18n="lblShots">Удары:</span>
+        <select id="stabShotFilter">
+          <option value="all" data-i18n="optAllShots">Все типы ударов</option>
+          <option value="ground" data-i18n="optGroundstrokes">Удары с отскока (FH/BH)</option>
+          <option value="fh_all" data-i18n="optFhAll">Весь форхенд (FH)</option>
+          <option value="bh_all" data-i18n="optBhAll">Весь бэкхенд (BH)</option>
+          <option value="fh_topspin" data-i18n="optFhTopspin">Форхенд топспин</option>
+          <option value="serve" data-i18n="optServe">Подача / Смэш</option>
+          <option value="slice" data-i18n="optSlice">Слайсы / Резаные</option>
+        </select>
+        <span class="select-label" style="margin-left: 6px;" data-i18n="lblRallyGap">Пауза:</span>
+        <select id="stabRallyGapSelect" style="padding: 6px 8px;">
+          <option value="4" data-i18n="optGap4">≤ 4 сек</option>
+          <option value="6" selected data-i18n="optGap6">≤ 6 сек</option>
+          <option value="8" data-i18n="optGap8">≤ 8 сек</option>
         </select>
       </div>
 
@@ -1248,6 +1342,121 @@
     </div>
   </main>
 
+  <!-- ================= 1.8 STABILITY, FATIGUE & HEATMAPS VIEW ================= -->
+  <main id="stabilityView" class="hidden">
+    <div class="verdict-box">
+      <div class="verdict-header">
+        <span>🔥</span>
+        <span data-i18n="stabVerdictTitle">Анализ выносливости, розыгрышей и порога стабильности</span>
+      </div>
+      <div class="verdict-list" id="stabVerdictList"></div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-title" data-i18n="kpiStabFatigue">Выносливость (Q1 → Q4)</div>
+        <div class="kpi-main-val" id="stabKpiFatigue">0 <span class="kpi-unit">км/ч</span></div>
+        <div class="kpi-sub" id="stabKpiFatigueSub">-</div>
+      </div>
+
+      <div class="kpi-card purple">
+        <div class="kpi-title" data-i18n="kpiStabRallies">Длина розыгрышей</div>
+        <div class="kpi-main-val" id="stabKpiMaxRally">0</div>
+        <div class="kpi-sub" id="stabKpiRallyAvg">-</div>
+      </div>
+
+      <div class="kpi-card cyan">
+        <div class="kpi-title" data-i18n="kpiStabTempo">Темп и плотность</div>
+        <div class="kpi-main-val" id="stabKpiTempo">0</div>
+        <div class="kpi-sub" id="stabKpiDuration">-</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-title" data-i18n="kpiStabSweetSpot">Оптимальная скорость (Sweet Spot)</div>
+        <div class="kpi-main-val" id="stabKpiSweetSpot">-</div>
+        <div class="kpi-sub" id="stabKpiBreakPoint">-</div>
+      </div>
+
+      <div class="kpi-card amber">
+        <div class="kpi-title" data-i18n="kpiStabDeepRally">Устойчивость в розыгрыше (#3+)</div>
+        <div class="kpi-main-val" id="stabKpiDeepRally">-</div>
+        <div class="kpi-sub" id="stabKpiDeepVar">-</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title" data-i18n="stabFatigueChartTitle">🔋 Кривая усталости по ходу тренировки (Q1 → Q4)</div>
+            <div class="card-subtitle" data-i18n="stabFatigueChartSub">Как меняются скорость маха и разброс (Variance) от разминки к концовке</div>
+          </div>
+        </div>
+        <div class="chart-container" style="height: 330px;">
+          <canvas id="fatigueCurveChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title" data-i18n="stabRallyChartTitle">🏓 Качество ударов по глубине розыгрыша (#1 → #5+)</div>
+            <div class="card-subtitle" data-i18n="stabRallyChartSub">Сравнение скорости и стабильности на 1-м, 2-м, 3-м, 4-м и 5+ ударах серии</div>
+          </div>
+        </div>
+        <div class="chart-container" style="height: 330px;">
+          <canvas id="rallyDepthChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title" data-i18n="stabVarCurveTitle">🎯 Поиск оптимальной скорости до роста Variance</div>
+            <div class="card-subtitle" data-i18n="stabVarCurveSub">Средний разброс (Variance) и объем в каждом диапазоне скорости маха</div>
+          </div>
+        </div>
+        <div class="chart-container" style="height: 340px;">
+          <canvas id="speedVsVarianceChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title" data-i18n="hmSpeedAngleTitle">🌡️ Тепловая матрица: Скорость × Угол удара</div>
+            <div class="card-subtitle" data-i18n="hmSpeedAngleSub">Плотность ваших ударов (% от выборки) и средний Variance в каждой зоне</div>
+          </div>
+        </div>
+        <div class="heatmap-wrap" id="heatmapSpeedAngleWrap"></div>
+        <div class="heatmap-legend">
+          <span data-i18n="hmLow">Мало</span>
+          <div class="heatmap-scale-bar"></div>
+          <span data-i18n="hmHigh">Горячая зона</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 24px;">
+      <div class="card-header">
+        <div>
+          <div class="card-title" data-i18n="hmRacketShotTitle">🔥 Тепловая матрица: Ракетка × Тип удара</div>
+          <div class="card-subtitle" data-i18n="hmRacketShotSub">Сравнение всех ракеток по каждому удару с цветовой подсветкой лидеров</div>
+        </div>
+        <div class="metric-pills">
+          <button class="metric-pill active" onclick="setHeatmapMetric('swingSpeed')" id="hmPillSpeed" data-i18n="metricSwingSpeed">Скорость (kph)</button>
+          <button class="metric-pill" onclick="setHeatmapMetric('estSpin')" id="hmPillSpin" data-i18n="metricEstSpin">Спин (~rpm)</button>
+          <button class="metric-pill" onclick="setHeatmapMetric('swingAngle')" id="hmPillAngle" data-i18n="metricSwingAngle">Угол (°)</button>
+          <button class="metric-pill" onclick="setHeatmapMetric('variance')" id="hmPillVar" data-i18n="metricVariance">Разброс (Var)</button>
+          <button class="metric-pill" onclick="setHeatmapMetric('count')" id="hmPillCount" data-i18n="colCount">Кол-во</button>
+        </div>
+      </div>
+      <div class="heatmap-wrap" id="heatmapRacketShotWrap"></div>
+    </div>
+  </main>
+
   <!-- ================= 2. COMPARE 2 SESSIONS VIEW ================= -->
   <main id="compareView" class="hidden">
     <div class="verdict-box">
@@ -1463,15 +1672,29 @@
       </div>
     </div>
 
-    <div class="card" style="margin-bottom: 20px;">
-      <div class="card-header">
-        <div>
-          <div class="card-title" data-i18n="dynChartAngleTitle">🌀 Динамика угла атаки (°) и стабильности (Variance) по дням</div>
-          <div class="card-subtitle" data-i18n="dynChartAngleSub">Средний угол удара, угол FH Топспина (°) и стабильность замаха (ниже = стабильнее)</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title" data-i18n="dynChartPctTitle">📊 Перцентильный коридор скорости (P25 – Медиана – P75 – Топ 10%)</div>
+            <div class="card-subtitle" data-i18n="dynChartPctSub">Рост базового «пола» (P25), медианы и верхнего потолка скорости (P90)</div>
+          </div>
+        </div>
+        <div class="chart-container" style="height: 320px;">
+          <canvas id="dynamicsPercentileChart"></canvas>
         </div>
       </div>
-      <div class="chart-container" style="height: 300px;">
-        <canvas id="dynamicsAngleVarChart"></canvas>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title" data-i18n="dynChartAngleTitle">🌀 Динамика угла атаки (°) и стабильности (Variance) по дням</div>
+            <div class="card-subtitle" data-i18n="dynChartAngleSub">Средний угол удара, угол FH Топспина (°) и стабильность замаха (ниже = стабильнее)</div>
+          </div>
+        </div>
+        <div class="chart-container" style="height: 320px;">
+          <canvas id="dynamicsAngleVarChart"></canvas>
+        </div>
       </div>
     </div>
 
@@ -1887,7 +2110,44 @@
         sessionEstSpinRow: 'Средняя оценка спина',
         sessionWristRotRow: 'Среднее вращение кисти',
         sessionWristElevRow: 'Вертикальный подъем кисти',
-        sessionVarianceRow: 'Стабильность (Variance, ниже лучше)'
+        sessionVarianceRow: 'Стабильность (Variance, ниже лучше)',
+        // Stability, Fatigue, Rallies, Sweet Spot, Percentiles, Heatmaps
+        tabStability: 'Усталость, темп и карты',
+        optGroundstrokes: 'Удары с отскока (FH/BH)',
+        optFhAll: 'Весь форхенд (FH)',
+        optBhAll: 'Весь бэкхенд (BH)',
+        lblRallyGap: 'Пауза:',
+        optGap4: '≤ 4 сек',
+        optGap6: '≤ 6 сек',
+        optGap8: '≤ 8 сек',
+        stabVerdictTitle: 'Анализ выносливости, розыгрышей и порога стабильности',
+        kpiStabFatigue: 'Выносливость (Q1 → Q4)',
+        kpiStabRallies: 'Длина розыгрышей',
+        kpiStabTempo: 'Темп и плотность',
+        kpiStabSweetSpot: 'Оптимальная скорость (Sweet Spot)',
+        kpiStabDeepRally: 'Устойчивость в розыгрыше (#3+)',
+        stabFatigueChartTitle: '🔋 Кривая усталости по ходу тренировки (Q1 → Q4)',
+        stabFatigueChartSub: 'Как меняются скорость маха и разброс (Variance) от разминки к концовке',
+        stabRallyChartTitle: '🏓 Качество ударов по глубине розыгрыша (#1 → #5+)',
+        stabRallyChartSub: 'Сравнение скорости и стабильности на 1-м, 2-м, 3-м, 4-м и 5+ ударах серии',
+        stabVarCurveTitle: '🎯 Поиск оптимальной скорости до роста Variance',
+        stabVarCurveSub: 'Средний разброс (Variance) и объем в каждом диапазоне скорости маха',
+        hmSpeedAngleTitle: '🌡️ Тепловая матрица: Скорость × Угол удара',
+        hmSpeedAngleSub: 'Плотность ваших ударов (% от выборки) и средний Variance в каждой зоне',
+        hmLow: 'Мало',
+        hmHigh: 'Горячая зона',
+        hmRacketShotTitle: '🔥 Тепловая матрица: Ракетка × Тип удара',
+        hmRacketShotSub: 'Сравнение всех ракеток по каждому удару с цветовой подсветкой лидеров',
+        dynChartPctTitle: '📊 Перцентильный коридор скорости (P25 – Медиана – P75 – Топ 10%)',
+        dynChartPctSub: 'Рост базового «пола» (P25), медианы и верхнего потолка скорости (P90)',
+        q1Label: 'Q1 (0-25%)',
+        q2Label: 'Q2 (25-50%)',
+        q3Label: 'Q3 (50-75%)',
+        q4Label: 'Q4 (75-100%)',
+        pctTop10: 'Топ 10% (P90)',
+        pctUpper: 'Верхн. квартиль (P75)',
+        pctMedian: 'Медиана (P50)',
+        pctFloor: 'Базовый пол (P25)'
       },
       en: {
         pageTitle: 'Tennis Swing Analyser — Stroke, Spin, Angle & Racket Analytics',
@@ -2126,7 +2386,44 @@
         sessionEstSpinRow: 'Average Est. Ball Spin',
         sessionWristRotRow: 'Average Wrist Rotation',
         sessionWristElevRow: 'Average Wrist Elevation (Lift)',
-        sessionVarianceRow: 'Consistency (Variance, lower is better)'
+        sessionVarianceRow: 'Consistency (Variance, lower is better)',
+        // Stability, Fatigue, Rallies, Sweet Spot, Percentiles, Heatmaps
+        tabStability: 'Fatigue, Pace & Heatmaps',
+        optGroundstrokes: 'Groundstrokes (FH/BH)',
+        optFhAll: 'All Forehands (FH)',
+        optBhAll: 'All Backhands (BH)',
+        lblRallyGap: 'Gap:',
+        optGap4: '≤ 4 sec',
+        optGap6: '≤ 6 sec',
+        optGap8: '≤ 8 sec',
+        stabVerdictTitle: 'Endurance, Rally Tempo & Stability Threshold',
+        kpiStabFatigue: 'Endurance (Q1 → Q4)',
+        kpiStabRallies: 'Rally Length',
+        kpiStabTempo: 'Pace & Density',
+        kpiStabSweetSpot: 'Optimal Sweet Spot',
+        kpiStabDeepRally: 'Deep Rally (#3+)',
+        stabFatigueChartTitle: '🔋 Session Fatigue Curve (Q1 → Q4)',
+        stabFatigueChartSub: 'How swing speed and variance shift from start to finish',
+        stabRallyChartTitle: '🏓 Shot Quality by Rally Depth (#1 → #5+)',
+        stabRallyChartSub: 'Swing speed and consistency on 1st, 2nd, 3rd, 4th & 5+ rally shots',
+        stabVarCurveTitle: '🎯 Optimal Speed vs Variance Breaking Point',
+        stabVarCurveSub: 'Average variance and shot volume across swing speed zones',
+        hmSpeedAngleTitle: '🌡️ 2D Heatmap: Swing Speed × Attack Angle',
+        hmSpeedAngleSub: 'Shot concentration (% of strokes) and average variance per zone',
+        hmLow: 'Low',
+        hmHigh: 'Hot Spot',
+        hmRacketShotTitle: '🔥 2D Heatmap: Racket × Shot Type Matrix',
+        hmRacketShotSub: 'Compare every racket across every stroke with color-coded leaders',
+        dynChartPctTitle: '📊 Speed Percentile Corridor (P25 – Median – P75 – Top 10%)',
+        dynChartPctSub: 'Track baseline floor (P25), median (P50) & top ceiling (P90)',
+        q1Label: 'Q1 (0-25%)',
+        q2Label: 'Q2 (25-50%)',
+        q3Label: 'Q3 (50-75%)',
+        q4Label: 'Q4 (75-100%)',
+        pctTop10: 'Top 10% (P90)',
+        pctUpper: 'Upper Quartile (P75)',
+        pctMedian: 'Median (P50)',
+        pctFloor: 'Baseline Floor (P25)'
       }
     };
 
@@ -2220,10 +2517,35 @@
       return { label: t('trajDown'), cls: 'angle-down', arrow: '↘' };
     }
 
+    function parseTimeToSeconds(val) {
+      if (val === undefined || val === null || val === '') return null;
+      const str = String(val).trim();
+      if (str.includes(':')) {
+        const parts = str.split(':').map(Number);
+        if (parts.length === 3 && !parts.some(isNaN)) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+        if (parts.length === 2 && !parts.some(isNaN)) return parts[0] * 60 + parts[1];
+      }
+      const num = Number(str);
+      return isNaN(num) ? null : num * 86400;
+    }
+
+    function computePercentile(sortedArr, p) {
+      if (!sortedArr || sortedArr.length === 0) return 0;
+      if (sortedArr.length === 1) return sortedArr[0];
+      const idx = (p / 100) * (sortedArr.length - 1);
+      const lo = Math.floor(idx);
+      const hi = Math.ceil(idx);
+      if (lo === hi) return sortedArr[lo];
+      return sortedArr[lo] + (sortedArr[hi] - sortedArr[lo]) * (idx - lo);
+    }
+
     function matchesShotFilter(shotType, filterKey) {
       if (!filterKey || filterKey === 'all') return true;
       const l = (shotType || '').toLowerCase();
       if (filterKey === 'serve') return l.includes('serve') || l.includes('smash');
+      if (filterKey === 'ground') return l.includes('forehand') || l.includes('backhand');
+      if (filterKey === 'fh_all') return l.includes('forehand') || l.includes('fh');
+      if (filterKey === 'bh_all') return l.includes('backhand') || l.includes('bh');
       if (filterKey === 'fh_topspin') return l.includes('forehand topspin');
       if (filterKey === 'fh_flat') return l.includes('forehand flat');
       if (filterKey === 'bh_topspin') return l.includes('backhand topspin');
@@ -2268,6 +2590,11 @@
     let spinRacketFilterId = 'all';
     let spinShotFilterType = 'all';
     let spinMechMetric = 'angle';
+    let stabSessionFilterId = 'all';
+    let stabRacketFilterId = 'all';
+    let stabShotFilterType = 'all';
+    let stabRallyGapSec = 6;
+    let heatmapMetric = 'swingSpeed';
     let racketsSessionFilterId = 'all';
     let dynamicsRacketFilterId = 'all';
     let dynamicsShotFilterType = 'all';
@@ -2280,12 +2607,16 @@
     let spinMechanicsChart = null;
     let spinAngleHistChart = null;
     let spinRacketChart = null;
+    let fatigueCurveChart = null;
+    let rallyDepthChart = null;
+    let speedVsVarianceChart = null;
     let compareBarChart = null;
     let compareAngleSpinChart = null;
     let racketsSpeedChart = null;
     let racketsProfileChart = null;
     let dynamicsSpeedChart = null;
     let dynamicsServeSpinChart = null;
+    let dynamicsPercentileChart = null;
     let dynamicsAngleVarChart = null;
 
     // Sort state for Shot Type & Spin tables
@@ -2373,6 +2704,26 @@
       document.getElementById('spinShotFilter').addEventListener('change', (e) => {
         spinShotFilterType = e.target.value;
         renderSpinView();
+      });
+
+      document.getElementById('stabSessionFilter').addEventListener('change', (e) => {
+        stabSessionFilterId = e.target.value;
+        renderStabilityView();
+      });
+
+      document.getElementById('stabRacketFilter').addEventListener('change', (e) => {
+        stabRacketFilterId = e.target.value;
+        renderStabilityView();
+      });
+
+      document.getElementById('stabShotFilter').addEventListener('change', (e) => {
+        stabShotFilterType = e.target.value;
+        renderStabilityView();
+      });
+
+      document.getElementById('stabRallyGapSelect').addEventListener('change', (e) => {
+        stabRallyGapSec = parseFloat(e.target.value) || 6;
+        renderStabilityView();
       });
 
       document.getElementById('compareSessionA').addEventListener('change', (e) => {
@@ -2775,18 +3126,21 @@
       currentMode = mode;
       document.getElementById('tabSingle').classList.toggle('active', mode === 'single');
       document.getElementById('tabSpin').classList.toggle('active', mode === 'spin');
+      document.getElementById('tabStability').classList.toggle('active', mode === 'stability');
       document.getElementById('tabCompare').classList.toggle('active', mode === 'compare');
       document.getElementById('tabRackets').classList.toggle('active', mode === 'rackets');
       document.getElementById('tabDynamics').classList.toggle('active', mode === 'dynamics');
 
       document.getElementById('singleSelectorGroup').classList.toggle('hidden', mode !== 'single');
       document.getElementById('spinSelectorGroup').classList.toggle('hidden', mode !== 'spin');
+      document.getElementById('stabilitySelectorGroup').classList.toggle('hidden', mode !== 'stability');
       document.getElementById('compareSelectorGroup').classList.toggle('hidden', mode !== 'compare');
       document.getElementById('racketsSelectorGroup').classList.toggle('hidden', mode !== 'rackets');
       document.getElementById('dynamicsSelectorGroup').classList.toggle('hidden', mode !== 'dynamics');
 
       document.getElementById('singleView').classList.toggle('hidden', mode !== 'single');
       document.getElementById('spinView').classList.toggle('hidden', mode !== 'spin');
+      document.getElementById('stabilityView').classList.toggle('hidden', mode !== 'stability');
       document.getElementById('compareView').classList.toggle('hidden', mode !== 'compare');
       document.getElementById('racketsView').classList.toggle('hidden', mode !== 'rackets');
       document.getElementById('dynamicsView').classList.toggle('hidden', mode !== 'dynamics');
@@ -2797,6 +3151,7 @@
     function renderCurrentView() {
       if (currentMode === 'single') renderSingleView();
       else if (currentMode === 'spin') renderSpinView();
+      else if (currentMode === 'stability') renderStabilityView();
       else if (currentMode === 'compare') renderCompareView();
       else if (currentMode === 'rackets') renderRacketsView();
       else if (currentMode === 'dynamics') renderDynamicsView();
@@ -2904,7 +3259,7 @@
     }
 
     function updateRacketSelects() {
-      const selectIds = ['singleRacketFilter', 'spinRacketFilter', 'dynamicsRacketFilter'];
+      const selectIds = ['singleRacketFilter', 'spinRacketFilter', 'stabRacketFilter', 'dynamicsRacketFilter'];
       selectIds.forEach(selId => {
         const el = document.getElementById(selId);
         if (el) {
@@ -3185,12 +3540,14 @@
     function populateSelects() {
       const sSelect = document.getElementById('singleSessionSelect');
       const spinSess = document.getElementById('spinSessionFilter');
+      const stabSess = document.getElementById('stabSessionFilter');
       const cmpA = document.getElementById('compareSessionA');
       const cmpB = document.getElementById('compareSessionB');
       const rFilt = document.getElementById('racketsSessionFilter');
 
       sSelect.innerHTML = '';
       if (spinSess) spinSess.innerHTML = '<option value="all">' + t('optAllSessions') + '</option>';
+      if (stabSess) stabSess.innerHTML = '<option value="all">' + t('optAllSessions') + '</option>';
       cmpA.innerHTML = '';
       cmpB.innerHTML = '';
       rFilt.innerHTML = '<option value="all">' + t('optAllSessions') + '</option>';
@@ -3212,6 +3569,7 @@
         let optB = opt1.cloneNode(true);
         let optR = opt1.cloneNode(true);
         if (spinSess) spinSess.appendChild(opt1.cloneNode(true));
+        if (stabSess) stabSess.appendChild(opt1.cloneNode(true));
         cmpA.appendChild(optA);
         cmpB.appendChild(optB);
         rFilt.appendChild(optR);
@@ -3223,6 +3581,9 @@
       sSelect.value = selectedSessionId;
       if (spinSess) {
         spinSess.value = (spinSessionFilterId && (spinSessionFilterId === 'all' || sessions.some(s => s.id === spinSessionFilterId))) ? spinSessionFilterId : 'all';
+      }
+      if (stabSess) {
+        stabSess.value = (stabSessionFilterId && (stabSessionFilterId === 'all' || sessions.some(s => s.id === stabSessionFilterId))) ? stabSessionFilterId : 'all';
       }
 
       if (!compareSessionAId || !sessions.some(s => s.id === compareSessionAId)) {
@@ -4103,6 +4464,527 @@
       renderSpinView();
     }
 
+    // ================= 1.8 STABILITY, FATIGUE & HEATMAPS VIEW =================
+    function setHeatmapMetric(metric) {
+      heatmapMetric = metric;
+      document.getElementById('hmPillSpeed').classList.toggle('active', metric === 'swingSpeed');
+      document.getElementById('hmPillSpin').classList.toggle('active', metric === 'estSpin');
+      document.getElementById('hmPillAngle').classList.toggle('active', metric === 'swingAngle');
+      document.getElementById('hmPillVar').classList.toggle('active', metric === 'variance');
+      document.getElementById('hmPillCount').classList.toggle('active', metric === 'count');
+      renderStabilityView();
+    }
+
+    function computeStabilityAnalytics() {
+      let targetSessions = sessions;
+      if (stabSessionFilterId !== 'all') {
+        targetSessions = sessions.filter(s => s.id === stabSessionFilterId);
+      }
+
+      const filteredShots = [];
+      const quarters = [
+        { sumSw: 0, sumVar: 0, sumSpin: 0, count: 0 },
+        { sumSw: 0, sumVar: 0, sumSpin: 0, count: 0 },
+        { sumSw: 0, sumVar: 0, sumSpin: 0, count: 0 },
+        { sumSw: 0, sumVar: 0, sumSpin: 0, count: 0 }
+      ];
+      const rallyLengths = [];
+      const rallyPosStats = {
+        1: { sumSw: 0, sumVar: 0, count: 0 },
+        2: { sumSw: 0, sumVar: 0, count: 0 },
+        3: { sumSw: 0, sumVar: 0, count: 0 },
+        4: { sumSw: 0, sumVar: 0, count: 0 },
+        5: { sumSw: 0, sumVar: 0, count: 0 }
+      };
+      let totalActiveMinutes = 0;
+
+      targetSessions.forEach(sess => {
+        // Compute full session time boundaries BEFORE shot filtering so Q1..Q4 reflect true session clock
+        const allTimes = sess.shots.map(sh => parseTimeToSeconds(sh.elapsedTime) ?? parseTimeToSeconds(sh.realTime));
+        const validAll = allTimes.filter(x => x !== null);
+        const minT = validAll.length > 0 ? Math.min(...validAll) : 0;
+        const maxT = validAll.length > 0 ? Math.max(...validAll) : 1;
+        const span = Math.max(maxT - minT, 1);
+        if (validAll.length >= 2) totalActiveMinutes += (maxT - minT) / 60;
+
+        // Detect rallies chronologically across session shots with matching filter/mark
+        let curRallyLen = 0;
+        let prevTimeSec = null;
+        let prevMark = null;
+
+        sess.shots.forEach((s, idx) => {
+          const r = getRacketForMark(sess, s.mark);
+          const passesRacket = (stabRacketFilterId === 'all') || (r && r.id === stabRacketFilterId);
+          const passesShot = matchesShotFilter(s.shotType, stabShotFilterType);
+
+          const tSec = allTimes[idx];
+          const progress = tSec !== null ? (tSec - minT) / span : (idx / Math.max(sess.shots.length - 1, 1));
+          const qIdx = Math.min(3, Math.max(0, Math.floor(progress * 4)));
+
+          const ang = getSwingAngleDeg(s);
+          const sp = getEstBallSpin(s);
+
+          // Rally progression across unfiltered/filtered timing
+          const gap = (tSec !== null && prevTimeSec !== null) ? (tSec - prevTimeSec) : 999;
+          const sameSegment = (prevMark === null || prevMark === s.mark);
+          if (gap >= 0 && gap <= stabRallyGapSec && sameSegment) {
+            curRallyLen++;
+          } else {
+            if (curRallyLen >= 2) rallyLengths.push(curRallyLen);
+            curRallyLen = 1;
+          }
+          prevTimeSec = tSec;
+          prevMark = s.mark;
+
+          if (!passesRacket || !passesShot) return;
+
+          filteredShots.push({ ...s, angleDeg: ang, estSpin: sp, racket: r });
+
+          quarters[qIdx].sumSw += s.swingSpeed;
+          quarters[qIdx].sumVar += s.variance;
+          quarters[qIdx].sumSpin += sp;
+          quarters[qIdx].count++;
+
+          const posKey = Math.min(5, curRallyLen);
+          rallyPosStats[posKey].sumSw += s.swingSpeed;
+          rallyPosStats[posKey].sumVar += s.variance;
+          rallyPosStats[posKey].count++;
+        });
+        if (curRallyLen >= 2) rallyLengths.push(curRallyLen);
+      });
+
+      // Optimal Speed vs Variance bins
+      const speedBins = [
+        { label: '<35', min: 0, max: 35, shots: [] },
+        { label: '35-45', min: 35, max: 45, shots: [] },
+        { label: '45-55', min: 45, max: 55, shots: [] },
+        { label: '55-65', min: 55, max: 65, shots: [] },
+        { label: '65-75', min: 65, max: 75, shots: [] },
+        { label: '75-85', min: 75, max: 85, shots: [] },
+        { label: '85-100', min: 85, max: 100, shots: [] },
+        { label: '100+', min: 100, max: 999, shots: [] }
+      ];
+      filteredShots.forEach(s => {
+        for (let b of speedBins) {
+          if (s.swingSpeed >= b.min && s.swingSpeed < b.max) {
+            b.shots.push(s);
+            break;
+          }
+        }
+      });
+
+      const validBins = speedBins.filter(b => b.shots.length >= 3).map(b => ({
+        label: b.label,
+        min: b.min,
+        max: b.max,
+        count: b.shots.length,
+        avgVar: +(b.shots.reduce((a, s) => a + s.variance, 0) / b.shots.length).toFixed(2),
+        avgSpeed: +(b.shots.reduce((a, s) => a + s.swingSpeed, 0) / b.shots.length).toFixed(1)
+      }));
+
+      // Sweet Spot: lowest variance bin among moderate-to-high speeds (or overall baseline), and breaking point where variance rises >= 15% above sweet spot
+      let sweetBin = validBins.length > 0 ? [...validBins].sort((a, b) => a.avgVar - b.avgVar)[0] : null;
+      let breakBin = null;
+      if (sweetBin) {
+        breakBin = validBins.find(b => b.min > sweetBin.min && b.avgVar >= sweetBin.avgVar * 1.18) || null;
+      }
+
+      return { filteredShots, quarters, rallyLengths, rallyPosStats, totalActiveMinutes, validBins, sweetBin, breakBin };
+    }
+
+    function renderStabilityView() {
+      const data = computeStabilityAnalytics();
+      renderStabilityVerdictAndKpis(data);
+      renderFatigueCurveChart(data);
+      renderRallyDepthChart(data);
+      renderSpeedVsVarianceChart(data);
+      renderSpeedAngleHeatmap(data.filteredShots);
+      renderRacketShotHeatmap(data.filteredShots);
+    }
+
+    function renderStabilityVerdictAndKpis(data) {
+      const { filteredShots, quarters, rallyLengths, rallyPosStats, totalActiveMinutes, sweetBin, breakBin } = data;
+      const kph = t('unitKph');
+      const vList = document.getElementById('stabVerdictList');
+      vList.innerHTML = '';
+
+      if (filteredShots.length === 0) {
+        vList.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">' + t('noShotsSelected') + '</div>';
+        document.getElementById('stabKpiFatigue').textContent = '-';
+        document.getElementById('stabKpiFatigueSub').textContent = '-';
+        document.getElementById('stabKpiMaxRally').textContent = '0';
+        document.getElementById('stabKpiRallyAvg').textContent = '-';
+        document.getElementById('stabKpiTempo').textContent = '0';
+        document.getElementById('stabKpiDuration').textContent = '-';
+        document.getElementById('stabKpiSweetSpot').textContent = '-';
+        document.getElementById('stabKpiBreakPoint').textContent = '-';
+        document.getElementById('stabKpiDeepRally').textContent = '-';
+        document.getElementById('stabKpiDeepVar').textContent = '-';
+        return;
+      }
+
+      // 1. Fatigue Q1 -> Q4
+      const q1 = quarters[0];
+      const q4 = quarters[3];
+      const q1Spd = q1.count > 0 ? q1.sumSw / q1.count : 0;
+      const q4Spd = q4.count > 0 ? q4.sumSw / q4.count : 0;
+      const q1Var = q1.count > 0 ? q1.sumVar / q1.count : 0;
+      const q4Var = q4.count > 0 ? q4.sumVar / q4.count : 0;
+      const dSpd = q4Spd - q1Spd;
+      const dVar = q4Var - q1Var;
+
+      document.getElementById('stabKpiFatigue').innerHTML = (q1.count && q4.count)
+        ? ((dSpd >= 0 ? '+' : '') + dSpd.toFixed(1) + ' <span class="kpi-unit">' + kph + '</span>')
+        : '-';
+      document.getElementById('stabKpiFatigueSub').textContent = (q1.count && q4.count)
+        ? (q1Spd.toFixed(1) + ' → ' + q4Spd.toFixed(1) + ' ' + kph + ' • Var ' + (dVar >= 0 ? '+' : '') + dVar.toFixed(2))
+        : '-';
+
+      // 2. Rallies
+      const maxRally = rallyLengths.length > 0 ? Math.max(...rallyLengths) : 1;
+      const avgRally = rallyLengths.length > 0 ? (rallyLengths.reduce((a, b) => a + b, 0) / rallyLengths.length) : 1;
+      document.getElementById('stabKpiMaxRally').innerHTML = maxRally + ' <span class="kpi-unit">' + t('unitShots') + '</span>';
+      document.getElementById('stabKpiRallyAvg').textContent = (currentLang === 'en' ? 'Rallies (2+): ' : 'Розыгрышей (2+): ') + rallyLengths.length + ' • Avg: ' + avgRally.toFixed(1);
+
+      // 3. Tempo
+      const tempoHr = totalActiveMinutes > 5 ? Math.round((filteredShots.length / totalActiveMinutes) * 60) : 0;
+      document.getElementById('stabKpiTempo').innerHTML = tempoHr + ' <span class="kpi-unit">' + (currentLang === 'en' ? 'shots/hr' : 'уд/час') + '</span>';
+      document.getElementById('stabKpiDuration').textContent = Math.round(totalActiveMinutes) + (currentLang === 'en' ? ' min active' : ' мин практики');
+
+      // 4. Sweet Spot
+      if (sweetBin) {
+        document.getElementById('stabKpiSweetSpot').innerHTML = sweetBin.label + ' <span class="kpi-unit">' + kph + '</span>';
+        document.getElementById('stabKpiBreakPoint').textContent = breakBin
+          ? ((currentLang === 'en' ? 'Var ' + sweetBin.avgVar + ' • Spikes at ' : 'Var ' + sweetBin.avgVar + ' • Рост с ') + breakBin.label)
+          : ('Min Var: ' + sweetBin.avgVar);
+      } else {
+        document.getElementById('stabKpiSweetSpot').textContent = '-';
+        document.getElementById('stabKpiBreakPoint').textContent = '-';
+      }
+
+      // 5. Deep Rally #3+ vs #1-2
+      const earlyCnt = rallyPosStats[1].count + rallyPosStats[2].count;
+      const deepCnt = rallyPosStats[3].count + rallyPosStats[4].count + rallyPosStats[5].count;
+      const earlySpd = earlyCnt > 0 ? (rallyPosStats[1].sumSw + rallyPosStats[2].sumSw) / earlyCnt : 0;
+      const deepSpd = deepCnt > 0 ? (rallyPosStats[3].sumSw + rallyPosStats[4].sumSw + rallyPosStats[5].sumSw) / deepCnt : 0;
+      const earlyVar = earlyCnt > 0 ? (rallyPosStats[1].sumVar + rallyPosStats[2].sumVar) / earlyCnt : 0;
+      const deepVar = deepCnt > 0 ? (rallyPosStats[3].sumVar + rallyPosStats[4].sumVar + rallyPosStats[5].sumVar) / deepCnt : 0;
+
+      if (earlyCnt > 0 && deepCnt > 0) {
+        const deepDiff = deepSpd - earlySpd;
+        document.getElementById('stabKpiDeepRally').innerHTML = (deepDiff >= 0 ? '+' : '') + deepDiff.toFixed(1) + ' <span class="kpi-unit">' + kph + '</span>';
+        document.getElementById('stabKpiDeepVar').textContent = 'Var: ' + deepVar.toFixed(2) + ' vs ' + earlyVar.toFixed(2) + ' (#1-2)';
+      } else {
+        document.getElementById('stabKpiDeepRally').textContent = '-';
+        document.getElementById('stabKpiDeepVar').textContent = '-';
+      }
+
+      // Verdict summary cards
+      const fatigueTxt = (q1.count && q4.count)
+        ? (currentLang === 'en'
+            ? ('From Q1 to Q4, swing speed changed by <b>' + (dSpd >= 0 ? '+' : '') + dSpd.toFixed(1) + ' kph</b> and variance shifted by <b>' + (dVar >= 0 ? '+' : '') + dVar.toFixed(2) + '</b>. ' + (dSpd < -2 ? 'Endurance fatigue appears in the final quarter.' : 'Strong late-session stamina — power holds up well!'))
+            : ('От разминки (Q1) к концовке (Q4) скорость изменилась на <b>' + (dSpd >= 0 ? '+' : '') + dSpd.toFixed(1) + ' ' + kph + '</b>, а разброс на <b>' + (dVar >= 0 ? '+' : '') + dVar.toFixed(2) + '</b>. ' + (dSpd < -2 ? 'К концу тренировки заметно накопление усталости.' : 'Отличная выносливость — мощность держится до финиша!')))
+        : '-';
+
+      const sweetTxt = sweetBin
+        ? (currentLang === 'en'
+            ? ('Lowest variance (<b>' + sweetBin.avgVar + '</b>) occurs at <b>' + sweetBin.label + ' kph</b> (' + sweetBin.count + ' shots).' + (breakBin ? ' Above <b>' + breakBin.label + ' kph</b>, variance climbs to <b>' + breakBin.avgVar + '</b>.' : ''))
+            : ('Минимальный разброс техники (<b>' + sweetBin.avgVar + '</b>) достигается в коридоре <b>' + sweetBin.label + ' ' + kph + '</b> (' + sweetBin.count + ' уд.).' + (breakBin ? ' При ускорении выше <b>' + breakBin.label + ' ' + kph + '</b> разброс растёт до <b>' + breakBin.avgVar + '</b>.' : '')))
+        : '-';
+
+      const rallyTxt = currentLang === 'en'
+        ? ('Detected <b>' + rallyLengths.length + '</b> rallies (max <b>' + maxRally + '</b> player hits in a row, avg <b>' + avgRally.toFixed(1) + '</b>). Tempo: <b>' + tempoHr + ' shots/hr</b>.')
+        : ('Обнаружено <b>' + rallyLengths.length + '</b> серий-розыгрышей (рекорд: <b>' + maxRally + '</b> ударов подряд, среднее: <b>' + avgRally.toFixed(1) + '</b>). Темп: <b>' + tempoHr + ' уд/час</b>.');
+
+      [
+        { title: currentLang === 'en' ? '🔋 Stamina & Late-Session Form' : '🔋 Выносливость и усталость', desc: fatigueTxt },
+        { title: currentLang === 'en' ? '🎯 Optimal Cruise Speed' : '🎯 Порог оптимальной скорости', desc: sweetTxt },
+        { title: currentLang === 'en' ? '🏓 Rallies & Match Tempo' : '🏓 Розыгрыши и темп игры', desc: rallyTxt }
+      ].forEach(it => {
+        let div = document.createElement('div');
+        div.className = 'verdict-item';
+        div.innerHTML = '<strong>' + it.title + '</strong><span>' + it.desc + '</span>';
+        vList.appendChild(div);
+      });
+    }
+
+    function renderFatigueCurveChart(data) {
+      const ctx = document.getElementById('fatigueCurveChart').getContext('2d');
+      if (fatigueCurveChart) fatigueCurveChart.destroy();
+
+      const labels = [t('q1Label'), t('q2Label'), t('q3Label'), t('q4Label')];
+      const speeds = data.quarters.map(q => q.count > 0 ? +(q.sumSw / q.count).toFixed(1) : null);
+      const vars = data.quarters.map(q => q.count > 0 ? +(q.sumVar / q.count).toFixed(2) : null);
+
+      fatigueCurveChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: t('colAvgSwing') + ' (' + t('unitKph') + ')',
+              data: speeds,
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.14)',
+              pointRadius: 6,
+              pointBackgroundColor: '#10b981',
+              yAxisID: 'ySpd',
+              tension: 0.25,
+              fill: true
+            },
+            {
+              label: t('colVariance'),
+              data: vars,
+              borderColor: '#ef4444',
+              backgroundColor: 'transparent',
+              borderDash: [4, 4],
+              pointRadius: 6,
+              pointBackgroundColor: '#ef4444',
+              yAxisID: 'yVar',
+              tension: 0.25
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { ticks: { color: '#cbd5e1' }, grid: { display: false } },
+            ySpd: { type: 'linear', position: 'left', title: { display: true, text: t('unitKph'), color: '#10b981' }, ticks: { color: '#10b981' }, grid: { color: '#1f2d47' } },
+            yVar: { type: 'linear', position: 'right', title: { display: true, text: 'Variance', color: '#f87171' }, ticks: { color: '#f87171' }, grid: { drawOnChartArea: false } }
+          },
+          plugins: { legend: { labels: { color: '#f1f5f9' } } }
+        }
+      });
+    }
+
+    function renderRallyDepthChart(data) {
+      const ctx = document.getElementById('rallyDepthChart').getContext('2d');
+      if (rallyDepthChart) rallyDepthChart.destroy();
+
+      const keys = [1, 2, 3, 4, 5];
+      const labels = ['#1', '#2', '#3', '#4', '#5+'];
+      const speeds = keys.map(k => data.rallyPosStats[k].count > 0 ? +(data.rallyPosStats[k].sumSw / data.rallyPosStats[k].count).toFixed(1) : 0);
+      const vars = keys.map(k => data.rallyPosStats[k].count > 0 ? +(data.rallyPosStats[k].sumVar / data.rallyPosStats[k].count).toFixed(2) : 0);
+
+      rallyDepthChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: t('colAvgSwing') + ' (' + t('unitKph') + ')',
+              data: speeds,
+              backgroundColor: 'rgba(59, 130, 246, 0.72)',
+              borderColor: '#3b82f6',
+              borderWidth: 1.5,
+              borderRadius: 6,
+              yAxisID: 'ySpd'
+            },
+            {
+              label: t('colVariance'),
+              data: vars,
+              type: 'line',
+              borderColor: '#f59e0b',
+              backgroundColor: '#f59e0b',
+              pointRadius: 5,
+              yAxisID: 'yVar',
+              tension: 0.25
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { ticks: { color: '#cbd5e1' }, grid: { display: false } },
+            ySpd: { type: 'linear', position: 'left', title: { display: true, text: t('unitKph'), color: '#60a5fa' }, ticks: { color: '#60a5fa' }, grid: { color: '#1f2d47' } },
+            yVar: { type: 'linear', position: 'right', title: { display: true, text: 'Variance', color: '#fbbf24' }, ticks: { color: '#fbbf24' }, grid: { drawOnChartArea: false } }
+          },
+          plugins: { legend: { labels: { color: '#f1f5f9' } } }
+        }
+      });
+    }
+
+    function renderSpeedVsVarianceChart(data) {
+      const ctx = document.getElementById('speedVsVarianceChart').getContext('2d');
+      if (speedVsVarianceChart) speedVsVarianceChart.destroy();
+
+      const bins = data.validBins;
+      const labels = bins.map(b => b.label + ' ' + t('unitKph'));
+      const vars = bins.map(b => b.avgVar);
+      const counts = bins.map(b => b.count);
+      const colors = bins.map(b => {
+        if (data.sweetBin && b.label === data.sweetBin.label) return '#10b981';
+        if (data.breakBin && b.min >= data.breakBin.min) return '#ef4444';
+        return '#3b82f6';
+      });
+
+      speedVsVarianceChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: t('colVariance'),
+              data: vars,
+              backgroundColor: colors.map(c => c + '99'),
+              borderColor: colors,
+              borderWidth: 1.5,
+              borderRadius: 6,
+              yAxisID: 'yVar'
+            },
+            {
+              label: t('colCount'),
+              data: counts,
+              type: 'line',
+              borderColor: '#a855f7',
+              backgroundColor: '#a855f7',
+              borderDash: [4, 4],
+              pointRadius: 4,
+              yAxisID: 'yCnt',
+              tension: 0.25
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { ticks: { color: '#cbd5e1', font: { size: 11 } }, grid: { display: false } },
+            yVar: { type: 'linear', position: 'left', title: { display: true, text: 'Variance', color: '#cbd5e1' }, ticks: { color: '#cbd5e1' }, grid: { color: '#1f2d47' } },
+            yCnt: { type: 'linear', position: 'right', title: { display: true, text: t('colCount'), color: '#c084fc' }, ticks: { color: '#c084fc' }, grid: { drawOnChartArea: false } }
+          },
+          plugins: { legend: { labels: { color: '#f1f5f9' } } }
+        }
+      });
+    }
+
+    function getHeatColorCss(norm) {
+      // norm in [0, 1] -> slate -> emerald -> amber -> crimson
+      if (norm <= 0.01) return 'rgba(15, 23, 42, 0.7)';
+      if (norm < 0.33) return 'rgba(16, 185, 129, ' + (0.16 + norm * 1.1).toFixed(2) + ')';
+      if (norm < 0.66) return 'rgba(245, 158, 11, ' + (0.25 + (norm - 0.33) * 1.3).toFixed(2) + ')';
+      return 'rgba(239, 68, 68, ' + (0.45 + (norm - 0.66) * 1.2).toFixed(2) + ')';
+    }
+
+    function renderSpeedAngleHeatmap(shots) {
+      const wrap = document.getElementById('heatmapSpeedAngleWrap');
+      wrap.innerHTML = '';
+      if (!shots || shots.length === 0) {
+        wrap.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">' + t('noShotsSelected') + '</div>';
+        return;
+      }
+
+      const speedRows = [
+        { label: '> 85 ' + t('unitKph'), min: 85, max: 999 },
+        { label: '70–85 ' + t('unitKph'), min: 70, max: 85 },
+        { label: '55–70 ' + t('unitKph'), min: 55, max: 70 },
+        { label: '40–55 ' + t('unitKph'), min: 40, max: 55 },
+        { label: '< 40 ' + t('unitKph'), min: 0, max: 40 }
+      ];
+      const angleCols = [
+        { label: '< -30° (Slice)', min: -999, max: -30 },
+        { label: '-30..-10°', min: -30, max: -10 },
+        { label: '-10..+15° (Flat)', min: -10, max: 15 },
+        { label: '+15..+30° (Top)', min: 15, max: 30 },
+        { label: '> +30° (Loop)', min: 30, max: 999 }
+      ];
+
+      const grid = speedRows.map(() => angleCols.map(() => ({ count: 0, sumVar: 0 })));
+      let maxCell = 1;
+
+      shots.forEach(s => {
+        const rIdx = speedRows.findIndex(r => s.swingSpeed >= r.min && s.swingSpeed < r.max);
+        const cIdx = angleCols.findIndex(c => s.angleDeg >= c.min && s.angleDeg < c.max);
+        if (rIdx >= 0 && cIdx >= 0) {
+          grid[rIdx][cIdx].count++;
+          grid[rIdx][cIdx].sumVar += s.variance;
+          if (grid[rIdx][cIdx].count > maxCell) maxCell = grid[rIdx][cIdx].count;
+        }
+      });
+
+      let html = '<table class="heatmap-table"><thead><tr><th></th>' + angleCols.map(c => '<th>' + c.label + '</th>').join('') + '</tr></thead><tbody>';
+      speedRows.forEach((row, rIdx) => {
+        html += '<tr><th class="hm-row-hdr">' + row.label + '</th>';
+        angleCols.forEach((col, cIdx) => {
+          const cell = grid[rIdx][cIdx];
+          const pct = (cell.count / shots.length) * 100;
+          const norm = cell.count / maxCell;
+          const bg = getHeatColorCss(norm);
+          const avgVar = cell.count > 0 ? (cell.sumVar / cell.count).toFixed(1) : '-';
+          const txtCol = cell.count === 0 ? '#475569' : '#fff';
+          html += '<td><div class="heatmap-cell" style="background:' + bg + ';color:' + txtCol + ';" title="' + row.label + ' | ' + col.label + ': ' + cell.count + ' (' + pct.toFixed(1) + '%), Var ' + avgVar + '">' +
+            (cell.count > 0 ? pct.toFixed(1) + '%' : '—') +
+            '<span class="hm-sub">' + (cell.count > 0 ? (cell.count + ' • v' + avgVar) : '') + '</span></div></td>';
+        });
+        html += '</tr>';
+      });
+      html += '</tbody></table>';
+      wrap.innerHTML = html;
+    }
+
+    function renderRacketShotHeatmap(shots) {
+      const wrap = document.getElementById('heatmapRacketShotWrap');
+      wrap.innerHTML = '';
+
+      const shotTypes = ['Forehand topspin', 'Forehand flat', 'Backhand topspin', 'Backhand flat', 'Serve/smash', 'Backhand slice'];
+      const rMap = new Map();
+      shots.forEach(s => {
+        if (!s.racket) return;
+        if (!rMap.has(s.racket.id)) rMap.set(s.racket.id, { racket: s.racket, byType: new Map() });
+        const ro = rMap.get(s.racket.id);
+        if (!ro.byType.has(s.shotType)) ro.byType.set(s.shotType, { count: 0, swingSpeed: 0, estSpin: 0, swingAngle: 0, variance: 0 });
+        const cell = ro.byType.get(s.shotType);
+        cell.count++;
+        cell.swingSpeed += s.swingSpeed;
+        cell.estSpin += s.estSpin;
+        cell.swingAngle += s.angleDeg;
+        cell.variance += s.variance;
+      });
+
+      const active = Array.from(rMap.values());
+      if (active.length === 0) {
+        wrap.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">' + t('noRacketData') + '</div>';
+        return;
+      }
+
+      const vals = [];
+      const matrix = active.map(row => shotTypes.map(tp => {
+        const c = row.byType.get(tp);
+        if (!c || c.count === 0) return null;
+        let v = 0;
+        if (heatmapMetric === 'count') v = c.count;
+        else v = c[heatmapMetric] / c.count;
+        vals.push(v);
+        return { val: v, count: c.count };
+      }));
+
+      const minV = vals.length ? Math.min(...vals) : 0;
+      const maxV = vals.length ? Math.max(...vals) : 1;
+      const span = Math.max(maxV - minV, 0.001);
+
+      let html = '<table class="heatmap-table"><thead><tr><th></th>' + shotTypes.map(tp => '<th>' + tp + '</th>').join('') + '</tr></thead><tbody>';
+      active.forEach((row, rIdx) => {
+        html += '<tr><th class="hm-row-hdr"><span class="racket-dot" style="background:' + row.racket.color + ';margin-right:6px;"></span>' + row.racket.name + '</th>';
+        shotTypes.forEach((tp, cIdx) => {
+          const cell = matrix[rIdx][cIdx];
+          if (!cell) {
+            html += '<td><div class="heatmap-cell" style="background:rgba(15,23,42,0.5);color:#475569;">—</div></td>';
+            return;
+          }
+          let norm = (cell.val - minV) / span;
+          if (heatmapMetric === 'variance') norm = 1 - norm; // lower variance is better/hotter green-amber
+          const bg = getHeatColorCss(0.15 + norm * 0.85);
+          const disp = heatmapMetric === 'count' ? cell.count : (heatmapMetric === 'estSpin' ? ('~' + Math.round(cell.val)) : heatmapMetric === 'variance' ? cell.val.toFixed(2) : heatmapMetric === 'swingAngle' ? ((cell.val >= 0 ? '+' : '') + cell.val.toFixed(1) + '°') : cell.val.toFixed(1));
+          html += '<td><div class="heatmap-cell" style="background:' + bg + ';color:#fff;">' + disp + '<span class="hm-sub">' + cell.count + ' ' + t('unitShots') + '</span></div></td>';
+        });
+        html += '</tr>';
+      });
+      html += '</tbody></table>';
+      wrap.innerHTML = html;
+    }
+
     // ================= 2. COMPARE 2 SESSIONS VIEW =================
     function renderCompareView() {
       const sessA = sessions.find(s => s.id === compareSessionAId);
@@ -4795,6 +5677,8 @@
           recordDetail = sess.date + ' (' + (maxS ? maxS.shotType : '') + ')';
         }
 
+        const sortedSpds = shots.map(s => s.swingSpeed).sort((a, b) => a - b);
+
         dayData.push({
           session: sess,
           date: sess.date,
@@ -4803,6 +5687,10 @@
           avgSwing: avgSw,
           avgBall: avgBl,
           maxSwing: maxSw,
+          p25: computePercentile(sortedSpds, 25),
+          p50: computePercentile(sortedSpds, 50),
+          p75: computePercentile(sortedSpds, 75),
+          p90: computePercentile(sortedSpds, 90),
           avgAngle: avgAng,
           avgVariance: avgVar,
           serveAvg: serveAvg,
@@ -4842,6 +5730,7 @@
 
       renderDynamicsSpeedChart(dayData);
       renderDynamicsServeSpinChart(dayData);
+      renderDynamicsPercentileChart(dayData);
       renderDynamicsAngleVarChart(dayData);
       renderDynamicsTable(dayData);
     }
@@ -4995,6 +5884,77 @@
           },
           plugins: {
             legend: { labels: { color: '#f1f5f9' } }
+          }
+        }
+      });
+    }
+
+    function renderDynamicsPercentileChart(dayData) {
+      const ctx = document.getElementById('dynamicsPercentileChart').getContext('2d');
+      if (dynamicsPercentileChart) dynamicsPercentileChart.destroy();
+
+      const labels = dayData.map(d => d.date);
+      const p25s = dayData.map(d => +d.p25.toFixed(1));
+      const p50s = dayData.map(d => +d.p50.toFixed(1));
+      const p75s = dayData.map(d => +d.p75.toFixed(1));
+      const p90s = dayData.map(d => +d.p90.toFixed(1));
+      const kph = t('unitKph');
+
+      dynamicsPercentileChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: t('pctFloor') + ' (' + kph + ')',
+              data: p25s,
+              borderColor: 'rgba(148, 163, 184, 0.7)',
+              borderDash: [3, 3],
+              pointRadius: 3,
+              backgroundColor: 'transparent',
+              fill: false,
+              tension: 0.25
+            },
+            {
+              label: t('pctUpper') + ' (' + kph + ')',
+              data: p75s,
+              borderColor: 'rgba(59, 130, 246, 0.7)',
+              backgroundColor: 'rgba(59, 130, 246, 0.16)',
+              pointRadius: 3,
+              fill: '-1',
+              tension: 0.25
+            },
+            {
+              label: t('pctMedian') + ' (' + kph + ')',
+              data: p50s,
+              borderColor: '#10b981',
+              backgroundColor: '#10b981',
+              borderWidth: 2.5,
+              pointRadius: 5,
+              fill: false,
+              tension: 0.25
+            },
+            {
+              label: t('pctTop10') + ' (' + kph + ')',
+              data: p90s,
+              borderColor: '#f59e0b',
+              borderDash: [5, 3],
+              backgroundColor: 'transparent',
+              pointRadius: 4,
+              fill: false,
+              tension: 0.25
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { ticks: { color: '#8494ab' }, grid: { display: false } },
+            y: { title: { display: true, text: kph, color: '#8494ab' }, ticks: { color: '#8494ab' }, grid: { color: '#1f2d47' } }
+          },
+          plugins: {
+            legend: { labels: { color: '#f1f5f9', font: { size: 11 } } }
           }
         }
       });
