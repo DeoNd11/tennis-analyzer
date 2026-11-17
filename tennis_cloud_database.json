@@ -1,6 +1,6 @@
 {
   "version": "3.2",
-  "updatedAt": "2026-11-12T23:40:05.972Z",
+  "updatedAt": "2026-11-17T22:08:47.264Z",
   "physicsMultiplier": 1.44,
   "rackets": [
     {
@@ -26,6 +26,12 @@
       "name": "Head Speed Pro Legend 49",
       "specs": "49, 310g, 18-20",
       "color": "#ec4899"
+    },
+    {
+      "id": "racket_1794953324305",
+      "name": "Babolat Pure Drive 55 Multi",
+      "specs": "300g, 16-19",
+      "color": "#10b981"
     }
   ],
   "sessions": [
