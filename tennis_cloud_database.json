@@ -1,6 +1,6 @@
 {
   "version": "3.2",
-  "updatedAt": "2026-11-27T23:00:12.054Z",
+  "updatedAt": "2026-11-27T23:00:21.015Z",
   "physicsMultiplier": 1.44,
   "rackets": [
     {
@@ -45006,7 +45006,7 @@
         }
       ],
       "racketMap": {
-        "0": "racket_1792446972684"
+        "0": "racket_1794953324305"
       }
     }
   ]
